@@ -9,10 +9,11 @@ import ProtectedRoute from "../ProtectedRoute/ProtectedRoute.jsx";
 import LoginModal from "../LoginModal/LoginModal.jsx";
 import RegisterModal from "../RegisterModal/RegisterModal.jsx";
 import EditProfileModal from "../EditProfileModal/EditProfileModal.jsx";
-import Header from "../Header/Header.jsx";
+import Header from "./Components/Header/Header.jsx";
 import Footer from "../Footer/Footer.jsx";
-import Main from "../Main/Main.jsx";
+import Main from "./Components/Main/Main.jsx";
 import Profile from "../Profile/Profile.jsx";
+import ItemModal from "./Components/ItemModal/ItemModal.jsx";
 import Login from "../Login/Login.jsx";
 import Register from "../Register/Register.jsx";
 
