@@ -1,8 +1,8 @@
 import "./Header.css";
-import logo from "../assets/ChatCustom_Logo_Dark.svg";
+import logo from "../../assets/ChatCustoms_logo_Dark.svg";
 import { Link } from "react-router-dom";
 import { useContext } from "react";
-import CurrentUserContext from "../../contexts/CurrentUserContext.jsx";
+import CurrentUserContext from "../Contexts/CurrentUserContext.jsx";
 
 function Header({ onLogin, onRegister }) {
   const currentUser = useContext(CurrentUserContext);
