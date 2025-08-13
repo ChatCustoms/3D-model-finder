@@ -5,33 +5,25 @@ import { Link } from "react-router-dom";
 import { useContext } from "react";
 import CurrentUserContext from "../../contexts/CurrentUserContext.jsx";
 
-function Header({ handleAddClick, weatherData, isOpen, onLogin, onRegister }) {
+function Header({ handleAddClick, isOpen, onLogin, onRegister }) {
   const currentUser = useContext(CurrentUserContext);
-  const currentDate = new Date().toLocaleString("default", {
-    month: "long",
-    day: "numeric",
-  });
   console.log("Header - currentUser:", currentUser);
   return (
     <header className="header">
       <div className="header__container">
         <Link to="/">
           {" "}
-          <img className="header__logo" src={logo} alt="WTWR" />
+          <img className="header__logo" src={logo} alt="ChatCustoms" />
         </Link>
-        <p className="header__date-and-location">
-          {currentDate}, {weatherData.city}
-        </p>
       </div>
-      <ToggleSwitch />
-      { currentUser && (
-      <button
-        type="button"
-        onClick={handleAddClick}
-        className="header__add-clothes-btn"
-      >
-        + Add clothes
-      </button>
+      {currentUser && (
+        <button
+          type="button"
+          onClick={handleAddClick}
+          className="header__add-clothes-btn"
+        >
+          + Add clothes
+        </button>
       )}
       {!currentUser ? (
         <div className="header__auth-buttons">
