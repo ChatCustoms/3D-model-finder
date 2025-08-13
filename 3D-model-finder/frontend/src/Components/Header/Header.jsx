@@ -1,11 +1,10 @@
 import "./Header.css";
 import logo from "../assets/ChatCustom_Logo_Dark.svg";
-import ToggleSwitch from "../ToggleSwitch/ToggleSwitch.jsx";
 import { Link } from "react-router-dom";
 import { useContext } from "react";
 import CurrentUserContext from "../../contexts/CurrentUserContext.jsx";
 
-function Header({ handleAddClick, isOpen, onLogin, onRegister }) {
+function Header({ onLogin, onRegister }) {
   const currentUser = useContext(CurrentUserContext);
   console.log("Header - currentUser:", currentUser);
   return (
@@ -16,15 +15,6 @@ function Header({ handleAddClick, isOpen, onLogin, onRegister }) {
           <img className="header__logo" src={logo} alt="ChatCustoms" />
         </Link>
       </div>
-      {currentUser && (
-        <button
-          type="button"
-          onClick={handleAddClick}
-          className="header__add-clothes-btn"
-        >
-          + Add clothes
-        </button>
-      )}
       {!currentUser ? (
         <div className="header__auth-buttons">
           <button type="button" className="header__login-btn" onClick={onLogin}>

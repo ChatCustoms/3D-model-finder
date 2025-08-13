@@ -1,6 +1,14 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
+import { updateProfile } from "../../utils/api.js";
+import * as auth from "../../utils/auth.js";
+import * as api from "../../utils/api.js";
+import CurrentUserContext from "../../contexts/CurrentUserContext.jsx";
+import ProtectedRoute from "../ProtectedRoute/ProtectedRoute.jsx";
+import LoginModal from "../LoginModal/LoginModal.jsx";
+import RegisterModal from "../RegisterModal/RegisterModal.jsx";
+import EditProfileModal from "../EditProfileModal/EditProfileModal.jsx";
 import Header from "../Header/Header.jsx";
 import Footer from "../Footer/Footer.jsx";
 import Main from "../Main/Main.jsx";
@@ -8,8 +16,8 @@ import Profile from "../Profile/Profile.jsx";
 import Login from "../Login/Login.jsx";
 import Register from "../Register/Register.jsx";
 
-functions App() {
-  const currentUser, setCurrentUser] = useState(null);
+function App() {
+  const [currentUser, setCurrentUser] = useState(null);
   const [loggedIn, setLoggedIn] = useState(false);
   const [activeModal, setActiveModal] = useState(null);
   const [selectedCard, setSelectedCard] = useState(null);
@@ -19,7 +27,7 @@ functions App() {
     setActiveModal("preview");
   };
 
-  const hnadleModalClose = () => {
+  const handleModalClose = () => {
     setActiveModal("");
   };
 
@@ -68,9 +76,6 @@ functions App() {
 
     request(_id, token)
       .then((updatedCard) => {
-        setClothingItems((cards) =>
-          cards.map((item) => (item._id === _id ? updatedCard : item))
-        );
         console.log("Card updated successfully:", updatedCard);
       })
       .catch(console.error);
@@ -88,6 +93,17 @@ functions App() {
     updateProfile(userData, token)
       .then((updatedUser) => {
         setCurrentUser(updatedUser);
+        handleModalClose();
+      })
+      .catch(console.error);
+  };
+
+  const handleDelete = (cardId) => {
+    const token = localStorage.getItem("jwt");
+    api
+      .deleteCard(cardId, token)
+      .then(() => {
+        console.log("Card deleted:", cardId);
         handleModalClose();
       })
       .catch(console.error);
@@ -119,87 +135,66 @@ functions App() {
   return (
     <CurrentUserContext.Provider value={currentUser}>
       <BrowserRouter basename="/">
-        <CurrentTemperatureUnitContext.Provider
-          value={{ currentTemperatureUnit, handleToggleSwitchChange }}
-        >
-          <div className="app">
-            <div className="app__content">
-              <Header
-                handleAddClick={handleAddClick}
-                weatherData={weatherData}
-                onLogin={openLoginModal}
-                onRegister={openRegisterModal}
+        <div className="app">
+          <div className="app__content">
+            <Header onLogin={openLoginModal} onRegister={openRegisterModal} />
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  <>
+                    <Main handleCardLike={handleCardLike} />
+                  </>
+                }
               />
-              <Routes>
-                <Route
-                  path="/"
-                  element={
-                    <>
-                      <Main
-                        weatherData={weatherData}
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute
+                    loggedIn={loggedIn}
+                    element={
+                      <Profile
+                        onSignOut={handleSignOut}
+                        loggedIn={loggedIn}
                         handleCardClick={handleCardClick}
-                        clothingItems={clothingItems}
+                        handleEditProfileClick={() =>
+                          setActiveModal("edit-profile")
+                        }
                         handleCardLike={handleCardLike}
                       />
-                    </>
-                  }
-                />
-                <Route
-                  path="/profile"
-                  element={
-                    <ProtectedRoute
-                      loggedIn={loggedIn}
-                      element={
-                        <Profile
-                          onSignOut={handleSignOut}
-                          loggedIn={loggedIn}
-                          clothingItems={clothingItems}
-                          handleCardClick={handleCardClick}
-                          handleAddClick={handleAddClick}
-                          handlEditProfileClick={() =>
-                            setActiveModal("edit-profile")
-                          }
-                          handleCardLike={handleCardLike}
-                        />
-                      }
-                    />
-                  }
-                />
-              </Routes>
-            </div>
-            <AddItemModal
-              isOpen={activeModal === "add-garment"}
-              onClose={handleModalClose}
-              onAddItemModalSubmit={handleAddItemModalSubmit}
-            />
-            <ItemModal
-              activeModal={activeModal}
-              card={selectedCard}
-              onClose={handleModalClose}
-              onDelete={handleDelete}
-            />
-            <EditProfileModal
-              isOpen={activeModal === "edit-profile"}
-              onClose={handleModalClose}
-              onUpdateUser={handleUpdateUser}
-            />
-            <Footer />
-            <LoginModal
-              isOpen={activeModal === "login"}
-              onOpen={openLoginModal}
-              onClose={handleModalClose}
-              onLogin={handleLogin}
-              onRegister={openRegisterModal}
-            />
-            <RegisterModal
-              isOpen={activeModal === "register"}
-              onOpen={openRegisterModal}
-              onClose={handleModalClose}
-              onRegister={handleRegister}
-              onLogin={openLoginModal}
-            />
+                    }
+                  />
+                }
+              />
+            </Routes>
           </div>
-        </CurrentTemperatureUnitContext.Provider>
+          <ItemModal
+            activeModal={activeModal}
+            card={selectedCard}
+            onClose={handleModalClose}
+            onDelete={handleDelete}
+          />
+          <EditProfileModal
+            isOpen={activeModal === "edit-profile"}
+            onClose={handleModalClose}
+            onUpdateUser={handleUpdateUser}
+          />
+          <Footer />
+          <LoginModal
+            isOpen={activeModal === "login"}
+            onOpen={openLoginModal}
+            onClose={handleModalClose}
+            onLogin={handleLogin}
+            onRegister={openRegisterModal}
+          />
+          <RegisterModal
+            isOpen={activeModal === "register"}
+            onOpen={openRegisterModal}
+            onClose={handleModalClose}
+            onRegister={handleRegister}
+            onLogin={openLoginModal}
+          />
+        </div>
       </BrowserRouter>
     </CurrentUserContext.Provider>
   );

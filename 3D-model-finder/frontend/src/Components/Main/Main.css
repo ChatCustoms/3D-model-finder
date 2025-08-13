@@ -1,0 +1,42 @@
+main {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: auto;
+}
+
+.search {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.search input[type="text"] {
+  padding: 0.5rem 1rem;
+  width: 60%;
+  max-width: 400px;
+  font-size: 1rem;
+  margin-right: 0.5rem;
+}
+
+.search button {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  background-color: #002147;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.cards__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.5rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.cards__text {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #333;
+}
