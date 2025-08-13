@@ -1,0 +1,13 @@
+
+<svg width="300" height="100" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .title { font: bold 24px sans-serif; fill: white; }
+    .subtitle { font: italic 14px sans-serif; fill: #ccc; }
+    .bracket { fill: #7FDBFF; font: bold 24px monospace; }
+  </style>
+  <rect width="100%" height="100%" fill="#002B5B"/>
+  <text x="10" y="40" class="bracket">{</text>
+  <text x="30" y="40" class="title">ChatCustoms</text>
+  <text x="210" y="40" class="bracket">}</text>
+  <text x="30" y="70" class="subtitle">Custom Software Solutions</text>
+</svg>
