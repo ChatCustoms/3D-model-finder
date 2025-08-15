@@ -6,11 +6,11 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 // import * as api from "../../utils/api.js";
 import CurrentUserContext from "./Components/Contexts/CurrentUserContext.jsx";
 // import ProtectedRoute from "../ProtectedRoute/ProtectedRoute.jsx";
-// import LoginModal from "../LoginModal/LoginModal.jsx";
-// import RegisterModal from "../RegisterModal/RegisterModal.jsx";
-// import EditProfileModal from "../EditProfileModal/EditProfileModal.jsx";
+import LoginModal from "./Components/LoginModal/LoginModal.jsx";
+import RegisterModal from "./Components/RegisterModal/RegisterModal.jsx";
+import EditProfileModal from "./Components/EditProfileModal/EditProfileModal.jsx";
 import Header from "./Components/Header/Header.jsx";
-// import Footer from "../Footer/Footer.jsx";
+import Footer from "./Components/Footer/Footer.jsx";
 import Main from "./Components/Main/Main.jsx";
 // import Profile from "../Profile/Profile.jsx";
 import ItemModal from "./Components/ItemModal/ItemModal.jsx";
@@ -30,46 +30,46 @@ function App() {
     setActiveModal("");
   };
 
-  // const handleLogin = (email, password) => {
-  //   // auth
-  //   //   .login(email, password)
-  //   //   .then((res) => {
-  //   //     localStorage.setItem("jwt", res.token);
-  //   //     setLoggedIn(true);
-  //   //     auth.checkToken(res.token).then((user) => {
-  //   //       setCurrentUser(user);
-  //   //       setLoggedIn(true);
-  //   //       handleModalClose();
-  //   //     });
-  //   //   })
-  //   //   .catch(console.error);
-  //   const fakeUser = {
-  //     name: "John Doe",
-  //     avatar: "https://example.com/avatar.jpg",
-  //     email,
-  //     _id: "12345",
-  //   };
-  //   setCurrentUser(fakeUser);
-  //   setLoggedIn(true);
-  //   handleModalClose();
-  // };
+  const handleLogin = (email, password) => {
+    // auth
+    //   .login(email, password)
+    //   .then((res) => {
+    //     localStorage.setItem("jwt", res.token);
+    //     setLoggedIn(true);
+    //     auth.checkToken(res.token).then((user) => {
+    //       setCurrentUser(user);
+    //       setLoggedIn(true);
+    //       handleModalClose();
+    //     });
+    //   })
+    //   .catch(console.error);
+    const fakeUser = {
+      name: "John Doe",
+      avatar: "https://example.com/avatar.jpg",
+      email,
+      _id: "12345",
+    };
+    setCurrentUser(fakeUser);
+    setLoggedIn(true);
+    handleModalClose();
+  };
 
-  // const handleRegister = ({ name, avatar, email, password }) => {
-  //   const userData = {
-  //     name,
-  //     avatar,
-  //     email,
-  //     password,
-  //   };
-  //   const loginData = {
-  //     email,
-  //     password,
-  //   };
-  //   auth
-  //     .register(userData)
-  //     .then(() => handleLogin(loginData))
-  //     .catch(console.error);
-  // };
+  const handleRegister = ({ name, avatar, email, password }) => {
+    const userData = {
+      name,
+      avatar,
+      email,
+      password,
+    };
+    const loginData = {
+      email,
+      password,
+    };
+    auth
+      .register(userData)
+      .then(() => handleLogin(loginData))
+      .catch(console.error);
+  };
   const handleCardLike = ({ _id, likes }) => {
     const token = localStorage.getItem("jwt");
 
@@ -89,22 +89,22 @@ function App() {
       .catch(console.error);
   };
 
-  // const handleSignOut = () => {
-  //   localStorage.removeItem("jwt");
-  //   setCurrentUser(null);
-  //   setLoggedIn(false);
-  //   handleModalClose();
-  // };
+  const handleSignOut = () => {
+    localStorage.removeItem("jwt");
+    setCurrentUser(null);
+    setLoggedIn(false);
+    handleModalClose();
+  };
 
-  // const handleUpdateUser = (userData) => {
-  //   const token = localStorage.getItem("jwt");
-  //   updateProfile(userData, token)
-  //     .then((updatedUser) => {
-  //       setCurrentUser(updatedUser);
-  //       handleModalClose();
-  //     })
-  //     .catch(console.error);
-  // };
+  const handleUpdateUser = (userData) => {
+    const token = localStorage.getItem("jwt");
+    updateProfile(userData, token)
+      .then((updatedUser) => {
+        setCurrentUser(updatedUser);
+        handleModalClose();
+      })
+      .catch(console.error);
+  };
 
   const handleDelete = (cardId) => {
     const token = localStorage.getItem("jwt");
@@ -183,13 +183,13 @@ function App() {
             onClose={handleModalClose}
             onDelete={handleDelete}
           />
-          {/* <EditProfileModal
+          <EditProfileModal
             isOpen={activeModal === "edit-profile"}
             onClose={handleModalClose}
             onUpdateUser={handleUpdateUser}
-          /> */}
-          {/* <Footer /> */}
-          {/* <LoginModal
+          />
+          <Footer />
+          <LoginModal
             isOpen={activeModal === "login"}
             onOpen={openLoginModal}
             onClose={handleModalClose}
@@ -202,7 +202,7 @@ function App() {
             onClose={handleModalClose}
             onRegister={handleRegister}
             onLogin={openLoginModal}
-          /> */}
+          />
         </div>
       </BrowserRouter>
     </CurrentUserContext.Provider>

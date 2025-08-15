@@ -1,5 +1,5 @@
 import "./Header.css";
-import logo from "../../assets/ChatCustoms_logo_Dark.svg";
+import logo from "../../assets/Header_logo.png";
 import { Link } from "react-router-dom";
 import { useContext } from "react";
 import CurrentUserContext from "../Contexts/CurrentUserContext.jsx";
