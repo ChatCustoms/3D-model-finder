@@ -1,0 +1,22 @@
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 171px 40px 24px 40px;
+}
+
+.footer__name {
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 20px;
+  color: #000000;
+  font-family: "cabinet Grotesk", sans-serif;
+}
+
+.footer__date {
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 20px;
+  color: #000000;
+  font-family: "cabinet Grotesk", sans-serif;
+}
