@@ -1,0 +1,57 @@
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-left: 20px;
+}
+
+.sidebar__user-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-right: 116px;
+}
+
+.sidebar__avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.sidebar__avatar-placeholder {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: #d9d9d9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 20px;
+  font-family: "Cabinet Grotesk", sans-serif;
+  color: #000;
+}
+
+.sidebar__username {
+  font-weight: 700;
+  font-size: 20px;
+  font-family: "Cabinet Grotesk", sans-serif;
+  color: #000;
+}
+
+.sidebar__edit-button,
+.sidebar__signout-button {
+  background: none;
+  border: none;
+  font-family: "Cabinet Grotesk", sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+}
+
+.sidebar__signout-button {
+  color: #ff4d00;
+}

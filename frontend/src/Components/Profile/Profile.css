@@ -85,3 +85,22 @@
   font-weight: 700;
   cursor: pointer;
 }
+
+.profile__search-form {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.profile__results,
+.profile__liked {
+  margin-top: 20px;
+}
+
+.cards__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  list-style: none;
+  padding: 0;
+}

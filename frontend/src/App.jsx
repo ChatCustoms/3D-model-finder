@@ -2,17 +2,18 @@ import { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 // import { updateProfile } from "../../utils/api.js";
-// import * as auth from "../../utils/auth.js";
-// import * as api from "../../utils/api.js";
+import auth from "./utils/auth.js";
+import * as api from "./utils/api.js";
+import About from "./Components/About/About.jsx";
 import CurrentUserContext from "./Components/Contexts/CurrentUserContext.jsx";
-// import ProtectedRoute from "../ProtectedRoute/ProtectedRoute.jsx";
+import ProtectedRoute from "./Components/ProtectedRoute.jsx";
 import LoginModal from "./Components/LoginModal/LoginModal.jsx";
 import RegisterModal from "./Components/RegisterModal/RegisterModal.jsx";
 import EditProfileModal from "./Components/EditProfileModal/EditProfileModal.jsx";
 import Header from "./Components/Header/Header.jsx";
 import Footer from "./Components/Footer/Footer.jsx";
 import Main from "./Components/Main/Main.jsx";
-// import Profile from "../Profile/Profile.jsx";
+import Profile from "./Components/Profile/Profile.jsx";
 import ItemModal from "./Components/ItemModal/ItemModal.jsx";
 
 function App() {
@@ -51,6 +52,9 @@ function App() {
     };
     setCurrentUser(fakeUser);
     setLoggedIn(true);
+
+    localStorage.setItem("jwt", "dev-token");
+
     handleModalClose();
   };
 
@@ -70,7 +74,7 @@ function App() {
       .then(() => handleLogin(loginData))
       .catch(console.error);
   };
-  const handleCardLike = ({ _id, likes }) => {
+  const handleCardLike = ({ _id, likes = [] }) => {
     const token = localStorage.getItem("jwt");
 
     if (!currentUser || !currentUser._id || !token) {
@@ -78,8 +82,7 @@ function App() {
       return;
     }
 
-    const isLiked = likes.includes(currentUser._id);
-
+    const isLiked = Array.isArray(likes) && likes.includes(currentUser._id);
     const request = isLiked ? api.removeCardLike : api.addCardLike;
 
     request(_id, token)
@@ -158,23 +161,27 @@ function App() {
               <Route
                 path="/profile"
                 element={
-                  ""
-                  // <ProtectedRoute
-                  //   loggedIn={loggedIn}
-                  //   element={
-                  //     <Profile
-                  //       onSignOut={handleSignOut}
-                  //       loggedIn={loggedIn}
-                  //       handleCardClick={handleCardClick}
-                  //       handleEditProfileClick={() =>
-                  //         setActiveModal("edit-profile")
-                  //       }
-                  //       handleCardLike={handleCardLike}
-                  //     />
-                  //   }
-                  // />
+                  <ProtectedRoute loggedIn={loggedIn}>
+                    <Profile
+                      onSignOut={handleSignOut}
+                      loggedIn={loggedIn}
+                      handleCardClick={handleCardClick}
+                      handlEditProfileClick={() =>
+                        setActiveModal("edit-profile")
+                      }
+                      handleCardLike={handleCardLike}
+                    />
+                  </ProtectedRoute>
                 }
               />
+              <Route
+              path="/about"
+              element={
+                <ProtectedRoute loggedIn={loggedIn}>
+                  <About onEditProfile={() => setActiveModal("edit-profile")} />
+                </ProtectedRoute>
+              }
+            />
             </Routes>
           </div>
           <ItemModal
