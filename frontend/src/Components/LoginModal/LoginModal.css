@@ -41,3 +41,9 @@
   font-weight: 600;
   font-family: "Cabinet Grotesk", sans-serif;
 }
+
+.modal__error {
+  color: red;
+  margin-top: 8px;
+  font-size: 14px;
+}

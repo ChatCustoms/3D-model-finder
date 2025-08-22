@@ -1,14 +1,17 @@
-import "./LoginModal.css";
 import { useState } from "react";
 import ModalWithForm from "../ModalWithForm/ModalWithForm";
+import "./LoginModal.css";
 
 const LoginModal = ({ isOpen, onClose, onLogin, onRegister }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onLogin({ email, password });
+    onLogin(email, password).catch(() =>
+      setErrorMsg("Invalid email or password")
+    );
   };
 
   return (
@@ -17,17 +20,14 @@ const LoginModal = ({ isOpen, onClose, onLogin, onRegister }) => {
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={handleSubmit}
-      hideDefaultButton={true}Ï
     >
       <label className="modal__label">
         Email
         <input
-          id="login-email"
           className="modal__input"
           type="email"
-          placeholder="Email"
-          onChange={(e) => setEmail(e.target.value)}
           value={email}
+          onChange={(e) => setEmail(e.target.value)}
           required
         />
       </label>
@@ -35,23 +35,33 @@ const LoginModal = ({ isOpen, onClose, onLogin, onRegister }) => {
       <label className="modal__label">
         Password
         <input
-          id="login-password"
           className="modal__input"
           type="password"
-          placeholder="Password"
-          onChange={(e) => setPassword(e.target.value)}
           value={password}
+          onChange={(e) => setPassword(e.target.value)}
           required
         />
       </label>
 
-      <div className="modal__button-row">
+      {errorMsg && <p className="modal__error">{errorMsg}</p>}
+
+      <div className="modal__footer">
         <button type="submit" className="modal__submit">
           Log In
         </button>
-        <button type="button" className="modal__register" onClick={onRegister}>
-          or Register
-        </button>
+        <p className="modal__switch">
+          or{" "}
+          <button
+            type="button"
+            className="modal__link"
+            onClick={() => {
+              setErrorMsg("");
+              onRegister();
+            }}
+          >
+            Sign Up
+          </button>
+        </p>
       </div>
     </ModalWithForm>
   );

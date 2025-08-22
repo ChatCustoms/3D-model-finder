@@ -34,3 +34,9 @@
   cursor: pointer;
   margin-top: 5px;
 }
+
+.modal__error {
+  color: red;
+  margin-top: 8px;
+  font-size: 14px;
+}

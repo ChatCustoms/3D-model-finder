@@ -1,44 +1,43 @@
-const baseUrl =
-  process.env.NODE_ENV === "production"
-    ? "https://"
-    : "http://localhost:3001";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-import { checkResponse } from "./api";
-
-const register = ({ name, avatar, email, password }) => {
-  console.log("auth.register called with:", { name, avatar, email, password });
-  return fetch(`${baseUrl}/signup`, {
+export const register = ({ name, avatar, email, password }) => {
+  return fetch(`${BASE_URL}/signup`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ name, avatar, email, password }),
   }).then((res) => {
-    return checkResponse(res);
+    if (!res.ok) {
+      return res.json().then((data) => Promise.reject(data));
+    }
+    return res.json();
   });
 };
 
-const login = ({ email, password }) => {
-  return fetch(`${baseUrl}/signin`, {
+export const login = ({ email, password }) => {
+  return fetch(`${BASE_URL}/signin`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
   }).then((res) => {
-    return checkResponse(res);
+    if (!res.ok) {
+      return res.json().then((data) => Promise.reject(data));
+    }
+    return res.json();
   });
 };
 
-const checkToken = (token) => {
-  return fetch(`${baseUrl}/users/me`, {
+export const checkToken = (token) => {
+  return fetch(`${BASE_URL}/users/me`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${token}`,
     },
   }).then((res) => {
-    return checkResponse(res);
+    if (!res.ok) {
+      return res.json().then((data) => Promise.reject(data));
+    }
+    return res.json();
   });
 };
 
-export default {
-  register,
-  login,
-  checkToken,
-};
+export default { register, login, checkToken };

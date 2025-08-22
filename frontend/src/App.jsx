@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-// import { updateProfile } from "../../utils/api.js";
 import auth from "./utils/auth.js";
 import * as api from "./utils/api.js";
 import About from "./Components/About/About.jsx";
@@ -15,6 +14,7 @@ import Footer from "./Components/Footer/Footer.jsx";
 import Main from "./Components/Main/Main.jsx";
 import Profile from "./Components/Profile/Profile.jsx";
 import ItemModal from "./Components/ItemModal/ItemModal.jsx";
+import { checkToken } from "./utils/auth.js";
 
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -32,48 +32,45 @@ function App() {
   };
 
   const handleLogin = (email, password) => {
-    // auth
-    //   .login(email, password)
-    //   .then((res) => {
-    //     localStorage.setItem("jwt", res.token);
-    //     setLoggedIn(true);
-    //     auth.checkToken(res.token).then((user) => {
-    //       setCurrentUser(user);
-    //       setLoggedIn(true);
-    //       handleModalClose();
-    //     });
-    //   })
-    //   .catch(console.error);
-    const fakeUser = {
-      name: "John Doe",
-      avatar: "https://example.com/avatar.jpg",
-      email,
-      _id: "12345",
+    return (e) => {
+      e.preventDefault();
+      setErrorMsg("");
+      if (!email || !password) {
+        setErrorMsg("Email and password are required");
+        return;
+      }
+      auth
+        .login({ email, password })
+        .then((res) => {
+          localStorage.setItem("jwt", res.token);
+          return auth.checkToken(res.token);
+        })
+        .then((user) => {
+          setCurrentUser(user);
+          setLoggedIn(true);
+          handleModalClose();
+        })
+        .catch(console.error);
     };
-    setCurrentUser(fakeUser);
-    setLoggedIn(true);
-
-    localStorage.setItem("jwt", "dev-token");
-
-    handleModalClose();
   };
 
   const handleRegister = ({ name, avatar, email, password }) => {
-    const userData = {
-      name,
-      avatar,
-      email,
-      password,
-    };
-    const loginData = {
-      email,
-      password,
-    };
-    auth
-      .register(userData)
-      .then(() => handleLogin(loginData))
-      .catch(console.error);
+    return auth
+      .register({ name, avatar, email, password })
+      .then(() => {
+        return auth.login({ email, password });
+      })
+      .then((data) => {
+        localStorage.setItem("jwt", data.token);
+        return auth.checkToken(data.token);
+      })
+      .then((userData) => {
+        setCurrentUser(userData);
+        setLoggedIn(true);
+        handleModalClose();
+      });
   };
+
   const handleCardLike = ({ _id, likes = [] }) => {
     const token = localStorage.getItem("jwt");
 
@@ -101,12 +98,15 @@ function App() {
 
   const handleUpdateUser = (userData) => {
     const token = localStorage.getItem("jwt");
-    updateProfile(userData, token)
+    return updateProfile(userData, token)
       .then((updatedUser) => {
         setCurrentUser(updatedUser);
         handleModalClose();
       })
-      .catch(console.error);
+      .catch((err) => {
+        console.error(err);
+        throw err;
+      });
   };
 
   const handleDelete = (cardId) => {
@@ -138,7 +138,10 @@ function App() {
           setLoggedIn(true);
         })
         .catch((err) => {
-          console.error(err);
+          console.error("Invalid token:", err);
+          localStorage.removeItem("jwt");
+          setCurrentUser(null);
+          setLoggedIn(false);
         });
     }
   }, []);
@@ -175,13 +178,15 @@ function App() {
                 }
               />
               <Route
-              path="/about"
-              element={
-                <ProtectedRoute loggedIn={loggedIn}>
-                  <About onEditProfile={() => setActiveModal("edit-profile")} />
-                </ProtectedRoute>
-              }
-            />
+                path="/about"
+                element={
+                  <ProtectedRoute loggedIn={loggedIn}>
+                    <About
+                      onEditProfile={() => setActiveModal("edit-profile")}
+                    />
+                  </ProtectedRoute>
+                }
+              />
             </Routes>
           </div>
           <ItemModal

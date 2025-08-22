@@ -1,12 +1,12 @@
-import React, { useState, useEffect, useContext } from "react";
-import CurrentUserContext from "../../contexts/CurrentUserContext";
-import "./EditProfileModal.css";
+import { useContext, useEffect, useState } from "react";
 import ModalWithForm from "../ModalWithForm/ModalWithForm";
+import CurrentUserContext from "../Contexts/CurrentUserContext";
 
 const EditProfileModal = ({ isOpen, onClose, onUpdateUser }) => {
   const currentUser = useContext(CurrentUserContext);
   const [name, setName] = useState("");
   const [avatar, setAvatar] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
 
   useEffect(() => {
     if (currentUser && isOpen) {
@@ -17,38 +17,45 @@ const EditProfileModal = ({ isOpen, onClose, onUpdateUser }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onUpdateUser({ name, avatar });
+    onUpdateUser({ name, avatar }).catch(() =>
+      setErrorMsg("Update failed. Please try again.")
+    );
   };
-
-  if (!isOpen) return null;
 
   return (
     <ModalWithForm
-      title="Change profile data"
+      titleText="Edit Profile"
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={handleSubmit}
-      buttonText="Save changes"
     >
       <label className="modal__label">
-        Name*
+        Name
         <input
+          className="modal__input"
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
-          className="modal__input"
         />
       </label>
+
       <label className="modal__label">
-        Avatar
+        Avatar URL
         <input
+          className="modal__input"
           type="url"
           value={avatar}
           onChange={(e) => setAvatar(e.target.value)}
-          className="modal__input"
+          required
         />
       </label>
+
+      {errorMsg && <p className="modal__error">{errorMsg}</p>}
+
+      <button type="submit" className="modal__submit">
+        Save Changes
+      </button>
     </ModalWithForm>
   );
 };

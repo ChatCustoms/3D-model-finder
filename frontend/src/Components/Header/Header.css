@@ -3,12 +3,15 @@
   justify-content: space-between;
   align-items: center;
   padding: 10px 10px 50px;
-  height: 80px;
+  height: auto;
 }
 
 .header__avatar {
-  width: 40px;
-  height: 40px;
+  width: auto;
+  height: 200px;
+  border-radius: 30%;
+  object-fit: cover;
+  border: 2px solid white;
 }
 
 .header__container {
@@ -16,8 +19,9 @@
 }
 
 .header__logo {
-  height: 80px;
-  width: 100px;
+  height: 200px;
+  width: auto;
+  object-fit: contain;
 }
 
 .header__user-container {
@@ -38,7 +42,7 @@
   border: none;
   font-family: "cabinet Grotesk", sans-serif;
   font-weight: 700;
-  font-size: 14px;
+  font-size: 20px;
   color: #fff;
   cursor: pointer;
 }
@@ -48,7 +52,7 @@
   border: none;
   font-family: "cabinet Grotesk", sans-serif;
   font-weight: 700;
-  font-size: 14px;
+  font-size: 20px;
   color: #fff;
   cursor: pointer;
   padding-left: 20px;
@@ -57,7 +61,8 @@
 .header__auth-buttons {
   display: flex;
   align-items: center;
-  height: 100%;
+  height: 200px;
+  gap: 20px;
   background-color: blue;
   padding: 0 20px;
   color: white;
@@ -65,5 +70,5 @@
   font-weight: 700;
   font-size: 20px;
   cursor: pointer;
-  border-radius: 5px;
+  border-radius: 15px;
 }

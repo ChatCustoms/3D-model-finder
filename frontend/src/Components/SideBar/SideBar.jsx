@@ -1,34 +1,28 @@
-import "./SideBar.css";
 import { useContext } from "react";
-import CurrentUserContext from "../../contexts/CurrentUserContext";
+import CurrentUserContext from "../Contexts/CurrentUserContext";
+import "./SideBar.css";
+import { Link } from "react-router-dom";
 
-function SideBar({ onEditProfile, onSignOut }) {
+const SideBar = ({ onEditProfile, onSignOut }) => {
   const currentUser = useContext(CurrentUserContext);
+    console.log("Rendering SideBar:", currentUser);
 
   return (
-    <div className="sidebar">
-      <div className="sidebar__user-info">
-        {currentUser?.avatar ? (
-          <img
-            src={currentUser.avatar}
-            alt={currentUser.name}
-            className="sidebar__avatar"
-          />
-        ) : (
-          <div className="sidebar__avatar-placeholder">
-            {currentUser?.name?.charAt(0)}
-          </div>
-        )}
-        <p className="sidebar__username">{currentUser?.name}</p>
-      </div>
+    <div className="sidebar profile__sidebar">
+
       <button className="sidebar__edit-button" onClick={onEditProfile}>
-        Change profile data
+        Edit Profile
       </button>
+
+      <Link to="/about" className="sidebar__edit-button">
+        About Me
+      </Link>
+
       <button className="sidebar__signout-button" onClick={onSignOut}>
-        Log out
+        Sign Out
       </button>
     </div>
   );
-}
+};
 
 export default SideBar;

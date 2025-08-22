@@ -27,8 +27,8 @@
 
 .modal__close {
   position: absolute;
-  top: 28px;
-  right: 28px;
+  top: -30px;
+  right: -7px;
   border: none;
   cursor: pointer;
   background-color: transparent;
