@@ -1,30 +1,21 @@
-const BASE_URL = 'https://api.thingiverse.com';
-const APP_TOKEN = import.meta.env.VITE_THINGIVERSE_APP_TOKEN; // Store this in .env file
+// frontend/src/utils/ThingiverseAPI.js
+const API_BASE = import.meta.env.VITE_API_BASE_URL; // e.g. http://localhost:3001 (dev) / https://api.yourdomain.com (prod)
 
-const headers = {
-  Authorization: `Bearer ${APP_TOKEN}`,
-};
-
-export const searchModels = async (query) => {
-  const res = await fetch(`${BASE_URL}/search/${query}?type=things`, {
-    headers,
-  });
-
-  if (!res.ok) {
-    throw new Error("Failed to fetch search results");
-  }
-
+// Search models via your backend proxy
+export async function searchModels(query, page = 1) {
+  const url = `${API_BASE}/api/thingiverse/search?q=${encodeURIComponent(
+    query
+  )}&type=things&page=${page}`;
+  const res = await fetch(url);
+  if (!res.ok)
+    throw new Error(`Failed to fetch search results (${res.status})`);
   return res.json();
-};
+}
 
-export const getModelDetails = async (thingId) => {
-  const res = await fetch(`${BASE_URL}/things/${thingId}`, {
-    headers,
-  });
-
-  if (!res.ok) {
-    throw new Error("Failed to fetch model details");
-  }
-
+// Single model details via your backend proxy
+export async function getModelDetails(thingId) {
+  const url = `${API_BASE}/api/thingiverse/things/${thingId}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Failed to fetch model details (${res.status})`);
   return res.json();
-};
+}
