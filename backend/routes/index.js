@@ -4,7 +4,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const auth = require("../middlewares/auth");
-
+const axios = require("axios");
 
 // Register
 router.post("/signup", async (req, res) => {
@@ -12,14 +12,12 @@ router.post("/signup", async (req, res) => {
   const hash = await bcrypt.hash(password, 10);
   try {
     const user = await User.create({ name, avatar, email, password: hash });
-    res
-      .status(201)
-      .send({
-        name: user.name,
-        avatar: user.avatar,
-        email: user.email,
-        _id: user._id,
-      });
+    res.status(201).send({
+      name: user.name,
+      avatar: user.avatar,
+      email: user.email,
+      _id: user._id,
+    });
   } catch (err) {
     res
       .status(400)
@@ -64,6 +62,69 @@ router.patch("/users/me", auth, async (req, res) => {
     res.send(updated);
   } catch (err) {
     res.status(400).send({ message: "Update failed" });
+  }
+});
+
+router.get("/thingiverse/search", async (req, res) => {
+  try {
+    const { q, type = "things", page = 1 } = req.query;
+    if (!q) return res.status(400).json({ message: "Missing query param q" });
+
+    const accessToken = process.env.THINGIVERSE_TOKEN;
+    if (!accessToken) {
+      return res
+        .status(500)
+        .json({ message: "Missing THINGIVERSE_TOKEN on server" });
+    }
+
+    const resp = await axios.get(
+      `https://api.thingiverse.com/search/${encodeURIComponent(q)}`,
+      {
+        params: {
+          type,
+          page,
+          access_token: accessToken, // <-- use query param style
+        },
+        headers: { Accept: "application/json" },
+        timeout: 10000,
+      }
+    );
+
+    res.status(200).json(resp.data);
+  } catch (err) {
+    const status = err.response?.status || 500;
+    const data = err.response?.data || {
+      message: err.message || "Thingiverse proxy error",
+    };
+    res.status(status).json(data);
+  }
+});
+
+router.get("/thingiverse/things/:id", async (req, res) => {
+  try {
+    const accessToken = process.env.THINGIVERSE_TOKEN;
+    if (!accessToken) {
+      return res
+        .status(500)
+        .json({ message: "Missing THINGIVERSE_TOKEN on server" });
+    }
+
+    const resp = await axios.get(
+      `https://api.thingiverse.com/things/${encodeURIComponent(req.params.id)}`,
+      {
+        params: { access_token: accessToken }, // query-param style works (you confirmed via curl)
+        headers: { Accept: "application/json" },
+        timeout: 10000,
+      }
+    );
+
+    res.status(200).json(resp.data);
+  } catch (err) {
+    const status = err.response?.status || 500;
+    const data = err.response?.data || {
+      message: err.message || "Thingiverse proxy error",
+    };
+    res.status(status).json(data);
   }
 });
 
