@@ -51,6 +51,15 @@
   gap: 20px;
 }
 
+.form__close {
+  position: absolute;
+  top: 20px;   /* adjust for modal look */
+  right: 20px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
 .modal__input {
   display: block;
   padding: 10px 0;

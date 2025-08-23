@@ -14,7 +14,7 @@ import Footer from "./Components/Footer/Footer.jsx";
 import Main from "./Components/Main/Main.jsx";
 import Profile from "./Components/Profile/Profile.jsx";
 import ItemModal from "./Components/ItemModal/ItemModal.jsx";
-import { checkToken } from "./utils/auth.js";
+import { login, checkToken } from "./utils/auth.js";
 
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -31,27 +31,18 @@ function App() {
     setActiveModal("");
   };
 
-  const handleLogin = (email, password) => {
-    return (e) => {
-      e.preventDefault();
-      setErrorMsg("");
-      if (!email || !password) {
-        setErrorMsg("Email and password are required");
-        return;
-      }
-      auth
-        .login({ email, password })
-        .then((res) => {
-          localStorage.setItem("jwt", res.token);
-          return auth.checkToken(res.token);
-        })
-        .then((user) => {
-          setCurrentUser(user);
-          setLoggedIn(true);
-          handleModalClose();
-        })
-        .catch(console.error);
-    };
+  const handleLogin = async (email, password) => {
+    // throws on error if your helper rejects on !res.ok
+    const { token } = await login({ email, password });
+    localStorage.setItem("jwt", token);
+
+    const user = await checkToken(token); // GET /api/users/me
+    setCurrentUser(user);
+    setLoggedIn(true);
+    // close modal, navigate, etc.
+    handleModalClose();
+
+    return token; // return something so callers can await if they want
   };
 
   const handleRegister = ({ name, avatar, email, password }) => {

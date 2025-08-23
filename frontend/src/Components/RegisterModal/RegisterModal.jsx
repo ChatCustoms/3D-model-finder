@@ -33,6 +33,7 @@ const RegisterModal = ({ isOpen, onClose, onRegister, onLogin }) => {
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={handleSubmit}
+      hideDefaultButton={true}
     >
       <label className="modal__label">
         Name

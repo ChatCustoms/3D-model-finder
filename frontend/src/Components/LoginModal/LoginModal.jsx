@@ -7,11 +7,20 @@ const LoginModal = ({ isOpen, onClose, onLogin, onRegister }) => {
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onLogin(email, password).catch(() =>
-      setErrorMsg("Invalid email or password")
-    );
+    setErrorMsg("");
+
+    if (!email || !password) {
+      setErrorMsg("Email and password are required");
+      return;
+    }
+
+    try {
+      await onLogin(email, password); // returns a Promise (see above)
+    } catch (err) {
+      setErrorMsg(err?.message || "Invalid email or password");
+    }
   };
 
   return (
@@ -20,6 +29,7 @@ const LoginModal = ({ isOpen, onClose, onLogin, onRegister }) => {
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={handleSubmit}
+      hideDefaultButton={true}
     >
       <label className="modal__label">
         Email
