@@ -134,20 +134,35 @@ router.get("/thingiverse/things/:id", async (req, res) => {
 router.get("/thingiverse/img", async (req, res) => {
   try {
     const { url } = req.query;
-    if (!url) return res.status(400).send("Missing url");
-
-    const r = await axios.get(url, { responseType: "stream", timeout: 10000 });
-
-    // propagate content type and allow cross-origin usage
-    if (r.headers["content-type"]) {
-      res.set("Content-Type", r.headers["content-type"]);
+    if (!url || !/^https?:\/\/.+/i.test(url)) {
+      return res.status(400).send("Missing or invalid url");
     }
-    res.set("Cross-Origin-Resource-Policy", "cross-origin");
-    res.set("Cache-Control", "public, max-age=86400");
 
-    r.data.pipe(res);
-  } catch (e) {
-    res.status(502).json({ message: "Image proxy failed" });
+    const upstream = await axios.get(url, {
+      responseType: "stream",
+      // Pretend to be a normal browser
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123 Safari/537.36",
+        Referer: "https://www.thingiverse.com/",
+        Accept: "image/avif,image/webp,image/apng,image/*,*/*;q=0.8",
+      },
+      timeout: 15000,
+      validateStatus: (s) => s >= 200 && s < 400, // follow redirects via axios
+      maxRedirects: 3,
+    });
+
+    // Pass through content type & length if present
+    if (upstream.headers["content-type"])
+      res.setHeader("Content-Type", upstream.headers["content-type"]);
+    if (upstream.headers["content-length"])
+      res.setHeader("Content-Length", upstream.headers["content-length"]);
+    res.setHeader("Cache-Control", "public, max-age=86400");
+
+    upstream.data.pipe(res);
+  } catch (err) {
+    const status = err.response?.status || 502;
+    res.status(status).send("Image proxy error");
   }
 });
 
