@@ -48,6 +48,11 @@ router.get("/users/me", auth, async (req, res) => {
 
 router.get("/test", (req, res) => res.send("Test route works!"));
 
+router.get("/thingiverse/debug-token", (req, res) => {
+  const present = !!process.env.THINGIVERSE_TOKEN;
+  res.json({ hasToken: present });
+});
+
 // Update profile
 router.patch("/users/me", auth, async (req, res) => {
   const { name, avatar } = req.body;
