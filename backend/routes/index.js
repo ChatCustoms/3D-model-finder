@@ -46,9 +46,7 @@ router.get("/users/me", auth, async (req, res) => {
   res.send(user);
 });
 
-router.get("/test", (req, res) => {
-  res.send("Test route works!");
-});
+router.get("/test", (req, res) => res.send("Test route works!"));
 
 // Update profile
 router.patch("/users/me", auth, async (req, res) => {

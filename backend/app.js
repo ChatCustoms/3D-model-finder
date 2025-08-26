@@ -9,34 +9,41 @@ const errorHandler = require("./middlewares/errorHandler");
 
 const app = express();
 
-app.set("trust proxy", 1);
-app.use(helmet());
-app.use(express.json());
+app.set("trust proxy", 1); // behind nginx
+app.use(helmet()); // sensible security headers
+app.use(express.json({ limit: "1mb" })); // optional size cap
 
-// CORS allow‑list
-const allowedOrigins = [
-  process.env.CLIENT_ORIGIN, // prod frontend
-  "http://localhost:5173",
-  "http://127.0.0.1:5173",
+// Build allow-list from env
+const envList = [
+  process.env.CLIENT_ORIGIN,
+  ...(process.env.EXTRA_CLIENT_ORIGINS
+    ? process.env.EXTRA_CLIENT_ORIGINS.split(",")
+    : []),
 ].filter(Boolean);
 
-app.use(
-  cors({
-    origin: (origin, cb) => {
-      if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
-      return cb(new Error("CORS not allowed"));
-    },
-    credentials: true,
-  })
-);
+const allowedOrigins = new Set(envList);
 
-// Health first (order doesn’t matter much)
+// CORS: allow dev tools (no Origin) and exact matches
+const corsOptions = {
+  origin: (origin, cb) => {
+    if (!origin) return cb(null, true); // curl/Postman
+    if (allowedOrigins.has(origin)) return cb(null, true);
+    return cb(new Error(`CORS not allowed for origin: ${origin}`));
+  },
+  credentials: true,
+};
+
+// Preflight first so failures are clear
+app.options("*", cors(corsOptions));
+app.use(cors(corsOptions));
+
+// Health
 app.get("/health", (_req, res) => res.status(200).send("ok"));
 
-// Mount API under /api
+// API
 app.use("/api", routes);
 
-// Error handler last
+// Errors last
 app.use(errorHandler);
 
 module.exports = app;
