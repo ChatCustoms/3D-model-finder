@@ -18,6 +18,13 @@ function Main({ handleCardLike }) {
 
   const handleCloseModal = () => setSelectedModel(null);
 
+  const proxied = (raw) =>
+    raw
+      ? `${
+          import.meta.env.VITE_API_BASE_URL
+        }/api/thingiverse/img?url=${encodeURIComponent(raw)}`
+      : "https://via.placeholder.com/150";
+
   const handleSearch = async (e) => {
     e.preventDefault();
 
@@ -36,7 +43,7 @@ function Main({ handleCardLike }) {
         return {
           _id: model.id,
           name: model.name,
-          image: imgUrl,
+          image: proxied(model.thumbnail),
           likes: [],
           description: model.description || "No description available",
           url:
