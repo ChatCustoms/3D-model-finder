@@ -25,22 +25,22 @@ function Main({ handleCardLike }) {
       const data = await searchModels(searchTerm);
       const results = data.hits || [];
 
+      // Map results to your UI's expected format
       const formattedResults = results.map((model) => {
-        const rawThumb = model.thumbnail;
-        const proxiedThumb = rawThumb
-          ? `${API_BASE}/api/img?url=${encodeURIComponent(rawThumb)}`
+        const imgUrl = model.thumbnail
+          ? `${API_BASE}/api/thingiverse/img?url=${encodeURIComponent(
+              model.thumbnail
+            )}`
           : "https://via.placeholder.com/150";
 
         return {
           _id: model.id,
           name: model.name,
-          image: proxiedThumb, // <-- use proxy
+          image: imgUrl,
           likes: [],
           description: model.description || "No description available",
           url:
             model.public_url || `https://www.thingiverse.com/thing:${model.id}`,
-          // keep the original in case you need it elsewhere:
-          _rawThumbnail: rawThumb,
         };
       });
 

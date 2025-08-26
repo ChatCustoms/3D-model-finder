@@ -131,4 +131,24 @@ router.get("/thingiverse/things/:id", async (req, res) => {
   }
 });
 
+router.get("/thingiverse/img", async (req, res) => {
+  try {
+    const { url } = req.query;
+    if (!url) return res.status(400).send("Missing url");
+
+    const r = await axios.get(url, { responseType: "stream", timeout: 10000 });
+
+    // propagate content type and allow cross-origin usage
+    if (r.headers["content-type"]) {
+      res.set("Content-Type", r.headers["content-type"]);
+    }
+    res.set("Cross-Origin-Resource-Policy", "cross-origin");
+    res.set("Cache-Control", "public, max-age=86400");
+
+    r.data.pipe(res);
+  } catch (e) {
+    res.status(502).json({ message: "Image proxy failed" });
+  }
+});
+
 module.exports = router;

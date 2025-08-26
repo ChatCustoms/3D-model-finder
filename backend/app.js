@@ -11,6 +11,16 @@ const app = express();
 
 app.set("trust proxy", 1); // behind nginx
 app.use(helmet()); // sensible security headers
+
+app.use(
+  helmet({
+    // allow other origins (e.g., your Netlify frontend) to use image responses
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    // optional, keeps current behavior
+    crossOriginOpenerPolicy: { policy: "same-origin" },
+  })
+);
+
 app.use(express.json({ limit: "1mb" })); // optional size cap
 
 // Build allow-list from env
