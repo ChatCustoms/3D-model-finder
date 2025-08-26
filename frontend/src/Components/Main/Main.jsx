@@ -1,8 +1,10 @@
 import "./Main.css";
-import ItemCard from "../ItemCard/ItemCard"; // Can be renamed ModelCard later
-import ItemModal from "../ItemModal/ItemModal"; // Can be renamed ModelModal later
+import ItemCard from "../ItemCard/ItemCard";
+import ItemModal from "../ItemModal/ItemModal";
 import { useState } from "react";
 import { searchModels } from "../../utils/ThingiverseAPI";
+
+const API_BASE = import.meta.env.VITE_API_BASE_URL; // <-- add this
 
 function Main({ handleCardLike }) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -14,32 +16,38 @@ function Main({ handleCardLike }) {
     setSelectedModel(model);
   };
 
-  const handleCloseModal = () => {
-    setSelectedModel(null);
-  };
+  const handleCloseModal = () => setSelectedModel(null);
 
   const handleSearch = async (e) => {
     e.preventDefault();
 
     try {
       const data = await searchModels(searchTerm);
-      const results = data.hits;
+      const results = data.hits || [];
 
-      // Map results to your UI's expected format
-      const formattedResults = results.map((model) => ({
-        _id: model.id,
-        name: model.name,
-        image: model.thumbnail || "https://via.placeholder.com/150",
-        likes: [], // Placeholder
-        description: model.description || "No description available",
-        url:
-          model.public_url || `https://www.thingiverse.com/thing:${model.id}`,
-      }));
+      const formattedResults = results.map((model) => {
+        const rawThumb = model.thumbnail;
+        const proxiedThumb = rawThumb
+          ? `${API_BASE}/api/img?url=${encodeURIComponent(rawThumb)}`
+          : "https://via.placeholder.com/150";
+
+        return {
+          _id: model.id,
+          name: model.name,
+          image: proxiedThumb, // <-- use proxy
+          likes: [],
+          description: model.description || "No description available",
+          url:
+            model.public_url || `https://www.thingiverse.com/thing:${model.id}`,
+          // keep the original in case you need it elsewhere:
+          _rawThumbnail: rawThumb,
+        };
+      });
 
       setSearchResults(formattedResults);
     } catch (err) {
       console.error("Search error:", err);
-      setSearchResults([]); // Optionally clear results
+      setSearchResults([]);
     }
   };
 
@@ -73,6 +81,7 @@ function Main({ handleCardLike }) {
           <p className="cards__text">Search for models to get started.</p>
         )}
       </section>
+
       {selectedModel && (
         <ItemModal
           activeModal="preview"
