@@ -22,10 +22,12 @@ function Header({ onLogin, onRegister }) {
 
   return (
     <header className="header">
-      <div className="header__container">
-        <Link to="/">
-          <img className="header__logo" src={logo} alt="ChatCustoms" />
-        </Link>
+      <div className="content-box">
+        <div className="header__container">
+          <Link to="/">
+            <img className="header__logo" src={logo} alt="ChatCustoms" />
+          </Link>
+        </div>
       </div>
 
       {!isLoggedIn ? (
