@@ -7,6 +7,10 @@ const axios = require("axios");
 
 const User = require("../models/user");
 const auth = require("../middlewares/auth");
+const {
+  likeByExternalId,
+  unlikeByExternalId,
+} = require("../controllers/likes");
 
 // ---------- Auth & Users ----------
 router.post("/signup", async (req, res) => {
@@ -26,6 +30,10 @@ router.post("/signup", async (req, res) => {
       .send({ message: "User creation failed", error: err.message });
   }
 });
+
+// ---------- Likes (by external Thingiverse id) ----------
+router.post("/items/:externalId/likes", auth, likeByExternalId);
+router.delete("/items/:externalId/likes", auth, unlikeByExternalId);
 
 router.post("/signin", async (req, res) => {
   const { email, password } = req.body;
