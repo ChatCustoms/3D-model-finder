@@ -5,17 +5,30 @@ import { useContext } from "react";
 import CurrentUserContext from "../Contexts/CurrentUserContext.jsx";
 
 function Header({ onLogin, onRegister }) {
-  const currentUser = useContext(CurrentUserContext);
-  console.log("Header - currentUser:", currentUser);
+  // Pull the actual user object out of the context wrapper
+  const ctx = useContext(CurrentUserContext) || { currentUser: null };
+  const user = ctx.currentUser;
+
+  console.log("Header - currentUser:", ctx);
+
+  const isLoggedIn = !!user;
+  const displayName = user?.name ?? "";
+  const avatarUrl = user?.avatar ?? "";
+  const initial =
+    String(displayName ?? "")
+      .trim()
+      .slice(0, 1)
+      .toUpperCase() || "?";
+
   return (
     <header className="header">
       <div className="header__container">
         <Link to="/">
-          {" "}
           <img className="header__logo" src={logo} alt="ChatCustoms" />
         </Link>
       </div>
-      {!currentUser ? (
+
+      {!isLoggedIn ? (
         <div className="header__auth-buttons">
           <button type="button" className="header__login-btn" onClick={onLogin}>
             Log In
@@ -30,17 +43,16 @@ function Header({ onLogin, onRegister }) {
         </div>
       ) : (
         <Link to="/profile" className="header__user-container">
-          <p className="header__username">{currentUser.name}</p>
-          {currentUser.avatar ? (
+          <p className="header__username">{displayName || "Profile"}</p>
+          {avatarUrl ? (
             <img
-              src={currentUser.avatar}
-              alt={currentUser.name}
+              src={avatarUrl}
+              alt={displayName || "User avatar"}
               className="header__avatar"
+              referrerPolicy="no-referrer"
             />
           ) : (
-            <div className="header__avatar-placeholder">
-              {currentUser.name.charAt(0)}
-            </div>
+            <div className="header__avatar-placeholder">{initial}</div>
           )}
         </Link>
       )}
