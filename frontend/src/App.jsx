@@ -126,19 +126,21 @@ function App() {
   useEffect(() => {
     const token = localStorage.getItem("jwt");
     if (token) {
-      auth
-        .checkToken(token)
-        .then((user) => {
-          setCurrentUser(user);
-          setLoggedIn(true);
-        })
-        .catch((err) => {
-          console.error("Invalid token:", err);
-          localStorage.removeItem("jwt");
-          setCurrentUser(null);
-          setLoggedIn(false);
-        });
+      setLoggedIn(false);
+      return;
     }
+    auth
+      .checkToken(token)
+      .then((user) => {
+        setCurrentUser(user);
+        setLoggedIn(true);
+      })
+      .catch((err) => {
+        console.error("Invalid token:", err);
+        localStorage.removeItem("jwt");
+        setCurrentUser(null);
+        setLoggedIn(false);
+      });
   }, []);
 
   return (

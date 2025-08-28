@@ -6,7 +6,12 @@ const ProtectedRoute = ({ children, loggedIn }) => {
   if (loggedIn === undefined || loggedIn === null) {
     return null;
   }
-  return loggedIn ? children : <Navigate to="/" replace />;
+  if (!loggedIn) {
+    const loc = useLocation();
+    return <Navigate to="/" replace state={{ from: loc }} />;
+  }
+
+  return children;
 };
 
 ProtectedRoute.propTypes = {
