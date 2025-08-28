@@ -157,57 +157,40 @@ function App() {
     <CurrentUserContext.Provider value={{ currentUser, setCurrentUser }}>
       <BrowserRouter basename="/">
         <div className="app">
-          <div className="app__content">
-            <Header onLogin={openLoginModal} onRegister={openRegisterModal} />
+          <Header onLogin={openLoginModal} onRegister={openRegisterModal} />
+
+          <main className="container">
             <Routes>
               <Route
                 path="/"
-                element={
-                  <>
-                    <Main handleCardLike={handleCardLike} />
-                  </>
-                }
+                element={<Main handleCardLike={handleCardLike} />}
               />
               <Route
                 path="/profile"
                 element={
-                  <ProtectedRoute loggedIn={loggedIn}>
+                  <ProtectedRoute isLoggedIn={loggedIn}>
                     <Profile
-                      onSignOut={handleSignOut}
-                      loggedIn={loggedIn}
                       handleCardClick={handleCardClick}
-                      handlEditProfileClick={() =>
-                        setActiveModal("edit-profile")
-                      }
+                      handleAddClick={handleAddClick}
+                      onSignOut={handleSignOut}
+                      handlEditProfileClick={openEditProfileModal}
                       handleCardLike={handleCardLike}
                     />
                   </ProtectedRoute>
                 }
               />
-              <Route
-                path="/about"
-                element={
-                  <ProtectedRoute loggedIn={loggedIn}>
-                    <About
-                      onEditProfile={() => setActiveModal("edit-profile")}
-                    />
-                  </ProtectedRoute>
-                }
-              />
+              <Route path="/about" element={<About />} />
             </Routes>
-          </div>
+          </main>
+
+          <Footer />
+
+          {/* Modals */}
           <ItemModal
             activeModal={activeModal}
-            card={selectedCard}
+            selectedItem={selectedItem}
             onClose={handleModalClose}
-            onDelete={handleDelete}
           />
-          <EditProfileModal
-            isOpen={activeModal === "edit-profile"}
-            onClose={handleModalClose}
-            onUpdateUser={handleUpdateUser}
-          />
-          <Footer />
           <LoginModal
             isOpen={activeModal === "login"}
             onOpen={openLoginModal}
@@ -221,6 +204,11 @@ function App() {
             onClose={handleModalClose}
             onRegister={handleRegister}
             onLogin={openLoginModal}
+          />
+          <EditProfileModal
+            isOpen={activeModal === "editProfile"}
+            onClose={handleModalClose}
+            onSubmit={handleEditProfile}
           />
         </div>
       </BrowserRouter>

@@ -8,7 +8,6 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  background-color: aqua;
 }
 
 .profile__user_info {

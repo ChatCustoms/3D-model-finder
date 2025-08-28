@@ -4,15 +4,6 @@ main {
   margin: auto;
 }
 
-.content-box {
-  background-color: rgba(0, 0, 0, 0.6);
-  color: #fff;
-  padding: 20px;
-  border-radius: 10px;
-  max-width: 900px;
-  margin: 0 auto;
-}
-
 .search {
   margin-bottom: 2rem;
   text-align: center;

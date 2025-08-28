@@ -51,64 +51,69 @@ function Profile({
   };
 
   return (
-    <div className="profile">
-      <div className="profile__sidebar">
-        <SideBar onSignOut={onSignOut} onEditProfile={handlEditProfileClick} />
-      </div>
-      <section className="profile__main">
-        <form onSubmit={handleSearch} className="profile__search-form">
-          <label htmlFor="search-input" className="profile__search-label">
-            Search for 3D Models:
-          </label>
-          <input
-            id="search-input"
-            className="profile__search-input"
-            type="text"
-            placeholder="e.g., dog, spaceship..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+    <div className="content-box">
+      <div className="profile">
+        <div className="profile__sidebar">
+          <SideBar
+            onSignOut={onSignOut}
+            onEditProfile={handlEditProfileClick}
           />
-          <button type="submit" className="profile__search-button">
-            Search
-          </button>
-        </form>
-
-        <div className="profile__results">
-          <h2>Search Results</h2>
-          {searchResults.length > 0 ? (
-            <ul className="cards__list">
-              {searchResults.map((item) => (
-                <ItemCard
-                  key={item._id}
-                  item={item}
-                  onCardClick={() => handleCardClick(item)}
-                  onCardLike={() => handleLike(item)}
-                />
-              ))}
-            </ul>
-          ) : searchTerm ? (
-            <p>No results found for "{searchTerm}".</p>
-          ) : null}
         </div>
+        <section className="profile__main">
+          <form onSubmit={handleSearch} className="profile__search-form">
+            <label htmlFor="search-input" className="profile__search-label">
+              Search for 3D Models:
+            </label>
+            <input
+              id="search-input"
+              className="profile__search-input"
+              type="text"
+              placeholder="e.g., dog, spaceship..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <button type="submit" className="profile__search-button">
+              Search
+            </button>
+          </form>
 
-        <div className="profile__liked">
-          <h2>Liked Models</h2>
-          {likedModels.length === 0 ? (
-            <p>You haven't liked any models yet.</p>
-          ) : (
-            <ul className="cards__list">
-              {likedModels.map((item) => (
-                <ItemCard
-                  key={item._id}
-                  item={item}
-                  onCardClick={() => handleCardClick(item)}
-                  onCardLike={() => handleLike(item)}
-                />
-              ))}
-            </ul>
-          )}
-        </div>
-      </section>
+          <div className="profile__results">
+            <h2>Search Results</h2>
+            {searchResults.length > 0 ? (
+              <ul className="cards__list">
+                {searchResults.map((item) => (
+                  <ItemCard
+                    key={item._id}
+                    item={item}
+                    onCardClick={() => handleCardClick(item)}
+                    onCardLike={() => handleLike(item)}
+                  />
+                ))}
+              </ul>
+            ) : searchTerm ? (
+              <p>No results found for "{searchTerm}".</p>
+            ) : null}
+          </div>
+
+          <div className="profile__liked">
+            <h2>Liked Models</h2>
+            {likedModels.length === 0 ? (
+              <p>You haven't liked any models yet.</p>
+            ) : (
+              <ul className="cards__list">
+                {likedModels.map((item) => (
+                  <ItemCard
+                    key={item._id}
+                    item={item}
+                    onCardClick={() => handleCardClick(item)}
+                    onCardLike={() => handleLike(item)}
+                  />
+                ))}
+              </ul>
+            )}
+          </div>
+        </section>
+      </div>
     </div>
   );
 }
