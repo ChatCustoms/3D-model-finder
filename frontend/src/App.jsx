@@ -171,7 +171,6 @@ function App() {
                   <ProtectedRoute isLoggedIn={loggedIn}>
                     <Profile
                       handleCardClick={handleCardClick}
-                      handleAddClick={handleAddClick}
                       onSignOut={handleSignOut}
                       handlEditProfileClick={openEditProfileModal}
                       handleCardLike={handleCardLike}
