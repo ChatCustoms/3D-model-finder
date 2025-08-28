@@ -53,34 +53,36 @@ function Main({ handleCardLike }) {
 
   return (
     <main>
-      <section className="search">
-        <form onSubmit={handleSearch}>
-          <input
-            type="text"
-            placeholder="Search 3D models..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <button type="submit">Search</button>
-        </form>
-      </section>
+      <div className="content-box">
+        <section className="search">
+          <form onSubmit={handleSearch}>
+            <input
+              type="text"
+              placeholder="Search 3D models..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <button type="submit">Search</button>
+          </form>
+        </section>
 
-      <section className="cards">
-        {searchResults.length > 0 ? (
-          <ul className="cards__list">
-            {searchResults.map((item) => (
-              <ItemCard
-                key={item._id ?? item.id}
-                item={item}
-                onCardLike={() => handleCardLike(item)}
-                onCardClick={() => handleCardClick(item)}
-              />
-            ))}
-          </ul>
-        ) : (
-          <p className="cards__text">Search for models to get started.</p>
-        )}
-      </section>
+        <section className="cards">
+          {searchResults.length > 0 ? (
+            <ul className="cards__list">
+              {searchResults.map((item) => (
+                <ItemCard
+                  key={item._id ?? item.id}
+                  item={item}
+                  onCardLike={() => handleCardLike(item)}
+                  onCardClick={() => handleCardClick(item)}
+                />
+              ))}
+            </ul>
+          ) : (
+            <p className="cards__text">Search for models to get started.</p>
+          )}
+        </section>
+      </div>
 
       {selectedModel && (
         <ItemModal
