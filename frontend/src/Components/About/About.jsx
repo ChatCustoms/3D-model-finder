@@ -8,6 +8,7 @@ const About = () => {
   const [name, setName] = useState("");
   const [avatar, setAvatar] = useState("");
   const [message, setMessage] = useState("");
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (currentUser) {
@@ -16,18 +17,26 @@ const About = () => {
     }
   }, [currentUser]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem("jwt");
+    setMessage("");
 
-    updateProfile({ name, avatar }, token)
-      .then(() => {
-        setMessage("Profile updated!");
-      })
-      .catch((err) => {
-        console.error(err);
-        setMessage("Update failed.");
-      });
+    const token = localStorage.getItem("jwt");
+    if (!token) {
+      setMessage("You're not logged in.");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const updated = await updateProfile({ name, avatar }, token);
+      setMessage("Profile updated!");
+    } catch (err) {
+      console.error("updateProfile failed:", err);
+      setMessage("Update failed.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -52,14 +61,18 @@ const About = () => {
             onChange={(e) => setAvatar(e.target.value)}
           />
         </label>
-        <button type="submit">Update Profile</button>
+        <button type="submit" disabled={saving}>
+          {saving ? "Saving..." : "Update Profile"}
+        </button>
         {message && <p className="about__message">{message}</p>}
       </form>
+
       <div className="about__info">
         <h1>Current User Info:</h1>
         <p>Name: {currentUser?.name || "N/A"}</p>
         <p>Avatar: {currentUser?.avatar || "N/A"}</p>
       </div>
+
       <div className="about__info">
         <h1>About This App</h1>
         <p>
