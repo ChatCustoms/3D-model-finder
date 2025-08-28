@@ -1,16 +1,18 @@
+// routes/index.js
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const User = require("../models/user");
-const auth = require("../middlewares/auth");
 const axios = require("axios");
 
-// Register
+const User = require("../models/user");
+const auth = require("../middlewares/auth");
+
+// ---------- Auth & Users ----------
 router.post("/signup", async (req, res) => {
   const { name, avatar, email, password } = req.body;
-  const hash = await bcrypt.hash(password, 10);
   try {
+    const hash = await bcrypt.hash(password, 10);
     const user = await User.create({ name, avatar, email, password: hash });
     res.status(201).send({
       name: user.name,
@@ -25,7 +27,6 @@ router.post("/signup", async (req, res) => {
   }
 });
 
-// Login
 router.post("/signin", async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -34,26 +35,17 @@ router.post("/signin", async (req, res) => {
       expiresIn: "7d",
     });
     res.send({ token });
-  } catch (err) {
+  } catch (_err) {
     res.status(401).send({ message: "Login failed" });
   }
 });
 
-// Get user profile
 router.get("/users/me", auth, async (req, res) => {
   const user = await User.findById(req.user._id);
   if (!user) return res.status(404).send({ message: "User not found" });
   res.send(user);
 });
 
-router.get("/test", (req, res) => res.send("Test route works!"));
-
-router.get("/thingiverse/debug-token", (req, res) => {
-  const present = !!process.env.THINGIVERSE_TOKEN;
-  res.json({ hasToken: present });
-});
-
-// Update profile
 router.patch("/users/me", auth, async (req, res) => {
   const { name, avatar } = req.body;
   try {
@@ -63,11 +55,14 @@ router.patch("/users/me", auth, async (req, res) => {
       { new: true, runValidators: true }
     );
     res.send(updated);
-  } catch (err) {
+  } catch (_err) {
     res.status(400).send({ message: "Update failed" });
   }
 });
 
+router.get("/test", (_req, res) => res.send("Test route works!"));
+
+// ---------- Thingiverse search proxy ----------
 router.get("/thingiverse/search", async (req, res) => {
   try {
     const { q, type = "things", page = 1 } = req.query;
@@ -83,11 +78,7 @@ router.get("/thingiverse/search", async (req, res) => {
     const resp = await axios.get(
       `https://api.thingiverse.com/search/${encodeURIComponent(q)}`,
       {
-        params: {
-          type,
-          page,
-          access_token: accessToken, // <-- use query param style
-        },
+        params: { type, page, access_token: accessToken },
         headers: { Accept: "application/json" },
         timeout: 10000,
       }
@@ -103,6 +94,7 @@ router.get("/thingiverse/search", async (req, res) => {
   }
 });
 
+// ---------- Thing details ----------
 router.get("/thingiverse/things/:id", async (req, res) => {
   try {
     const accessToken = process.env.THINGIVERSE_TOKEN;
@@ -115,7 +107,7 @@ router.get("/thingiverse/things/:id", async (req, res) => {
     const resp = await axios.get(
       `https://api.thingiverse.com/things/${encodeURIComponent(req.params.id)}`,
       {
-        params: { access_token: accessToken }, // query-param style works (you confirmed via curl)
+        params: { access_token: accessToken },
         headers: { Accept: "application/json" },
         timeout: 10000,
       }
@@ -131,38 +123,60 @@ router.get("/thingiverse/things/:id", async (req, res) => {
   }
 });
 
+// ---------- Image proxy (so images load over HTTPS with proper headers) ----------
 router.get("/thingiverse/img", async (req, res) => {
   try {
     const { url } = req.query;
-    if (!url || !/^https?:\/\/.+/i.test(url)) {
-      return res.status(400).send("Missing or invalid url");
-    }
+    if (!url) return res.status(400).send("Missing url");
 
     const upstream = await axios.get(url, {
-      responseType: "stream",
-      // Pretend to be a normal browser
+      responseType: "arraybuffer",
+      timeout: 10000,
       headers: {
+        // present as a regular browser
         "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123 Safari/537.36",
-        Referer: "https://www.thingiverse.com/",
+          "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
         Accept: "image/avif,image/webp,image/apng,image/*,*/*;q=0.8",
+        Referer: "https://www.thingiverse.com/",
       },
-      timeout: 15000,
-      validateStatus: (s) => s >= 200 && s < 400, // follow redirects via axios
-      maxRedirects: 3,
+      validateStatus: (s) => s >= 200 && s < 400,
     });
 
-    // Pass through content type & length if present
-    if (upstream.headers["content-type"])
-      res.setHeader("Content-Type", upstream.headers["content-type"]);
-    if (upstream.headers["content-length"])
-      res.setHeader("Content-Length", upstream.headers["content-length"]);
-    res.setHeader("Cache-Control", "public, max-age=86400");
+    const ct = upstream.headers["content-type"]?.toString() || "image/jpeg";
 
-    upstream.data.pipe(res);
+    res.setHeader("Content-Type", ct);
+    res.setHeader("Cache-Control", "public, max-age=86400, immutable");
+    res.send(Buffer.from(upstream.data));
   } catch (err) {
-    const status = err.response?.status || 502;
-    res.status(status).send("Image proxy error");
+    res.status(502).send("Image fetch failed");
+  }
+});
+
+// (Optional) Debug helpers you used during setup:
+router.get("/thingiverse/debug-token", (_req, res) => {
+  res.json({ hasToken: !!process.env.THINGIVERSE_TOKEN });
+});
+
+router.get("/thingiverse/debug-curl", async (_req, res) => {
+  try {
+    const accessToken = process.env.THINGIVERSE_TOKEN;
+    if (!accessToken)
+      return res.status(500).json({ message: "Missing THINGIVERSE_TOKEN" });
+    const r = await axios.get("https://api.thingiverse.com/search/car/", {
+      params: { type: "things", page: 1, access_token: accessToken },
+      timeout: 10000,
+    });
+    res.json({
+      ok: true,
+      status: r.status,
+      hits: Array.isArray(r.data?.hits) ? r.data.hits.length : null,
+    });
+  } catch (e) {
+    res.status(e.response?.status || 500).json({
+      ok: false,
+      status: e.response?.status || 500,
+      data: e.response?.data || e.message,
+    });
   }
 });
 

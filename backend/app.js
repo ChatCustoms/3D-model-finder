@@ -1,4 +1,4 @@
-// backend/app.js
+// app.js
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
@@ -9,51 +9,36 @@ const errorHandler = require("./middlewares/errorHandler");
 
 const app = express();
 
-app.set("trust proxy", 1); // behind nginx
-app.use(helmet()); // sensible security headers
+app.set("trust proxy", 1);
+app.use(helmet());
+app.use(express.json());
+
+// CORS allow-list
+const allowedOrigins = [
+  process.env.CLIENT_ORIGIN, // prod frontend (Netlify)
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+].filter(Boolean);
 
 app.use(
-  helmet({
-    // allow other origins (e.g., your Netlify frontend) to use image responses
-    crossOriginResourcePolicy: { policy: "cross-origin" },
-    // optional, keeps current behavior
-    crossOriginOpenerPolicy: { policy: "same-origin" },
+  cors({
+    origin: (origin, cb) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        return cb(null, true);
+      }
+      return cb(new Error("CORS not allowed"));
+    },
+    credentials: true,
   })
 );
 
-app.use(express.json({ limit: "1mb" })); // optional size cap
-
-// Build allow-list from env
-const envList = [
-  process.env.CLIENT_ORIGIN,
-  ...(process.env.EXTRA_CLIENT_ORIGINS
-    ? process.env.EXTRA_CLIENT_ORIGINS.split(",")
-    : []),
-].filter(Boolean);
-
-const allowedOrigins = new Set(envList);
-
-// CORS: allow dev tools (no Origin) and exact matches
-const corsOptions = {
-  origin: (origin, cb) => {
-    if (!origin) return cb(null, true); // curl/Postman
-    if (allowedOrigins.has(origin)) return cb(null, true);
-    return cb(new Error(`CORS not allowed for origin: ${origin}`));
-  },
-  credentials: true,
-};
-
-// Preflight first so failures are clear
-app.options("*", cors(corsOptions));
-app.use(cors(corsOptions));
-
-// Health
+// Health check
 app.get("/health", (_req, res) => res.status(200).send("ok"));
 
-// API
+// Mount API under /api
 app.use("/api", routes);
 
-// Errors last
+// Error handler last
 app.use(errorHandler);
 
 module.exports = app;
