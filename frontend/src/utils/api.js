@@ -1,74 +1,83 @@
-const baseUrl =
-  process.env.NODE_ENV === "production"
-    ? "https://api.wtwr.random-domain.org"
-    : "http://localhost:3001";
+// frontend/src/utils/api.js
 
-function getItems(token) {
-  return fetch(`${baseUrl}/items`, {
+// Prefer the Vite env var. Fall back to sensible defaults for dev/prod.
+const API_BASE =
+  import.meta.env.VITE_API_BASE_URL ||
+  (import.meta.env.DEV
+    ? "http://localhost:3001"
+    : "https://api-3d-model-finder.duckdns.org");
+
+// Helper to keep response handling consistent
+function checkResponse(res) {
+  if (!res.ok) return Promise.reject(`Error: ${res.status}`);
+  return res.json();
+}
+
+// --- Items endpoints (only if your backend implements them under /api/items) ---
+
+export function getItems(token) {
+  return fetch(`${API_BASE}/api/items`, {
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
+    // If you ever switch to cookie auth, uncomment:
+    // credentials: "include",
   }).then(checkResponse);
 }
 
-function deleteItem(id, token) {
-  return fetch(`${baseUrl}/items/${id}`, {
+export function deleteItem(id, token) {
+  return fetch(`${API_BASE}/api/items/${id}`, {
     method: "DELETE",
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
+    // credentials: "include",
   }).then(checkResponse);
 }
 
-function addItem(item, token) {
-  return fetch(`${baseUrl}/items`, {
+export function addItem(item, token) {
+  return fetch(`${API_BASE}/api/items`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
+    // credentials: "include",
     body: JSON.stringify(item),
   }).then(checkResponse);
 }
 
 export const addCardLike = (id, token) => {
-  return fetch(`${baseUrl}/items/${id}/likes`, {
+  return fetch(`${API_BASE}/api/items/${id}/likes`, {
     method: "PUT",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+    headers: { Authorization: `Bearer ${token}` },
+    // credentials: "include",
   }).then(checkResponse);
 };
 
 export const removeCardLike = (id, token) => {
-  return fetch(`${baseUrl}/items/${id}/likes`, {
+  return fetch(`${API_BASE}/api/items/${id}/likes`, {
     method: "DELETE",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+    headers: { Authorization: `Bearer ${token}` },
+    // credentials: "include",
   }).then(checkResponse);
 };
 
-function checkResponse(response) {
-  if (!response.ok) {
-    return Promise.reject(`Error: ${response.status}`);
-  }
-  return response.json();
-}
+// --- Profile ---
 
-const updateProfile = (data, token) => {
-  return fetch(`${baseUrl}/users/me`, {
+export function updateProfile(data, token) {
+  return fetch(`${API_BASE}/api/users/me`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
+    // credentials: "include",
     body: JSON.stringify(data),
-  }).then((res) => {
-    return checkResponse(res);
-  });
-};
+  }).then(checkResponse);
+}
 
-export { getItems, deleteItem, addItem, checkResponse, updateProfile };
+// Optional: export the base if other modules need it
+export { API_BASE, checkResponse };

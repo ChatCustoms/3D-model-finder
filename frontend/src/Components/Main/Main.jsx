@@ -4,50 +4,43 @@ import ItemModal from "../ItemModal/ItemModal";
 import { useState } from "react";
 import { searchModels } from "../../utils/ThingiverseAPI";
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL; // <-- add this
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 function Main({ handleCardLike }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [selectedModel, setSelectedModel] = useState(null);
 
-  const handleCardClick = (model) => {
-    console.log("Card clicked:", model);
-    setSelectedModel(model);
-  };
-
+  const handleCardClick = (model) => setSelectedModel(model);
   const handleCloseModal = () => setSelectedModel(null);
-
-  const proxied = (raw) =>
-    raw
-      ? `${
-          import.meta.env.VITE_API_BASE_URL
-        }/api/thingiverse/img?url=${encodeURIComponent(raw)}`
-      : "https://via.placeholder.com/150";
 
   const handleSearch = async (e) => {
     e.preventDefault();
-
     try {
       const data = await searchModels(searchTerm);
       const results = data.hits || [];
 
-      // Map results to your UI's expected format
-      const formattedResults = results.map((model) => {
-        const imgUrl = model.thumbnail
+      const formattedResults = results.map((m) => {
+        const rawThumb =
+          m.thumbnail ||
+          m.preview_image ||
+          m.thumbnail_960_url ||
+          m.thumbnail_625_url ||
+          m.public_url; // last-ditch fallback
+
+        const image = rawThumb
           ? `${API_BASE}/api/thingiverse/img?url=${encodeURIComponent(
-              model.thumbnail
+              rawThumb
             )}`
-          : "https://via.placeholder.com/150";
+          : "https://via.placeholder.com/300x200?text=No+Image";
 
         return {
-          _id: model.id,
-          name: model.name,
-          image: proxied(model.thumbnail),
+          _id: m.id,
+          name: m.name,
+          image,
           likes: [],
-          description: model.description || "No description available",
-          url:
-            model.public_url || `https://www.thingiverse.com/thing:${model.id}`,
+          description: m.description || "No description available",
+          url: m.public_url || `https://www.thingiverse.com/thing:${m.id}`,
         };
       });
 
