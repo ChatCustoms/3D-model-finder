@@ -4,5 +4,9 @@ body {
   font-family: 'Inter', sans-serif;
   margin: 0;
   padding: 0;
-  background-color: #087bcd;
+  height: 100vh;
+  background-image: url('../src/assets/background-image.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
