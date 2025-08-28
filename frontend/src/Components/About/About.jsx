@@ -4,7 +4,7 @@ import { updateProfile } from "../../utils/api";
 import "./About.css";
 
 const About = () => {
-  const currentUser = useContext(CurrentUserContext);
+  const { currentUser, setCurrentUser } = useContext(CurrentUserContext);
   const [name, setName] = useState("");
   const [avatar, setAvatar] = useState("");
   const [message, setMessage] = useState("");
@@ -30,6 +30,7 @@ const About = () => {
     setSaving(true);
     try {
       const updated = await updateProfile({ name, avatar }, token);
+      setCurrentUser((prev) => ({ ...(prev || {}), ...updated }));
       setMessage("Profile updated!");
     } catch (err) {
       console.error("updateProfile failed:", err);

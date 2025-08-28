@@ -1,8 +1,33 @@
-# React + Vite
+# 3D Model Finder
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A full-stack web application that allows users to search, preview, and save 3D printing models using the Thingiverse API.  
+Built as a capstone project for the TripleTen Software Engineering Program.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Features
+- Search 3D models from Thingiverse
+- View model images, descriptions, and external links
+- Like and save favorite models
+- User authentication (JWT)
+- Profile management (update name and avatar)
+- Responsive design for desktop, tablet, and mobile
+
+---
+
+## 🛠 Tech Stack
+- **Frontend:** React (Vite), React Router, Context API, CSS  
+- **Backend:** Node.js, Express, MongoDB Atlas, JWT, bcrypt  
+- **Deployment:** Netlify/Vercel (frontend), Google Cloud VM (backend)
+
+---
+
+## 📂 Project Structure
+3D-model-finder/
+├── frontend/   # React client
+├── backend/    # Express API
+└── README.md   # Project docs
+
+🏆 Acknowledgments
+	•	TripleTen Software Engineering Bootcamp
+	•	Thingiverse API

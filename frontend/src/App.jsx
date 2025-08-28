@@ -138,7 +138,7 @@ function App() {
   }, []);
 
   return (
-    <CurrentUserContext.Provider value={currentUser}>
+    <CurrentUserContext.Provider value={{ currentUser, setCurrentUser }}>
       <BrowserRouter basename="/">
         <div className="app">
           <div className="app__content">
