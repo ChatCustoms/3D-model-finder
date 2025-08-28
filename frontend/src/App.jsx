@@ -62,7 +62,7 @@ function App() {
       });
   };
 
-  const handleCardLike = ({ _id, likes = [] }) => {
+  const handleCardLike = (item = {}) => {
     const token = localStorage.getItem("jwt");
 
     if (!currentUser || !currentUser._id || !token) {
@@ -70,14 +70,30 @@ function App() {
       return;
     }
 
-    const isLiked = Array.isArray(likes) && likes.includes(currentUser._id);
+    // Accept both shapes: Thingiverse search results (id) and normalized (_id)
+    const externalId =
+      item?._id ?? item?.id ?? item?.thing_id ?? item?.thingId ?? null;
+
+    if (!externalId) {
+      console.warn("No externalId found on item:", item);
+      return; // prevent /items/undefined/likes
+    }
+
+    // Likes array may not exist for raw search results — default to []
+    const likes = Array.isArray(item.likes) ? item.likes : [];
+    const isLiked = likes.includes(currentUser._id);
+
+    // Use POST to like, DELETE to unlike (avoid PUT that your server doesn't implement)
     const request = isLiked ? api.removeCardLike : api.addCardLike;
 
-    request(_id, token)
-      .then((updatedCard) => {
-        console.log("Card updated successfully:", updatedCard);
+    request(externalId, token)
+      .then((updated) => {
+        console.log("Card updated successfully:", updated);
+        // TODO: update UI state if needed (e.g., refetch or optimistic update)
       })
-      .catch(console.error);
+      .catch((err) => {
+        console.error("Like toggle failed:", err);
+      });
   };
 
   const handleSignOut = () => {

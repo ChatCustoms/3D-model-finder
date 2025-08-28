@@ -50,15 +50,15 @@ export function addItem(item, token) {
 }
 
 export const addCardLike = (id, token) => {
-  return fetch(`${API_BASE}/api/items/${id}/likes`, {
-    method: "PUT",
+  return fetch(`${API_BASE}/api/items/${encodeURIComponent(id)}/likes`, {
+    method: "POST",
     headers: { Authorization: `Bearer ${token}` },
     // credentials: "include",
   }).then(checkResponse);
 };
 
 export const removeCardLike = (id, token) => {
-  return fetch(`${API_BASE}/api/items/${id}/likes`, {
+  return fetch(`${API_BASE}/api/items/${encodeURIComponent(id)}/likes`, {
     method: "DELETE",
     headers: { Authorization: `Bearer ${token}` },
     // credentials: "include",

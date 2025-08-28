@@ -4,7 +4,7 @@ import ItemModal from "../ItemModal/ItemModal";
 import { useState } from "react";
 import { searchModels } from "../../utils/ThingiverseAPI";
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL;
+import { API_BASE } from "../../utils/api";
 
 function Main({ handleCardLike }) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -70,9 +70,9 @@ function Main({ handleCardLike }) {
           <ul className="cards__list">
             {searchResults.map((item) => (
               <ItemCard
-                key={item._id}
+                key={item._id ?? item.id}
                 item={item}
-                onCardLike={handleCardLike}
+                onCardLike={() => handleCardLike(item)}
                 onCardClick={() => handleCardClick(item)}
               />
             ))}
@@ -87,7 +87,7 @@ function Main({ handleCardLike }) {
           activeModal="preview"
           model={selectedModel}
           onClose={handleCloseModal}
-          onLike={handleCardLike}
+          onLike={() => handleCardLike(selectedModel)}
         />
       )}
     </main>
