@@ -1,6 +1,7 @@
 import { useState } from "react";
 import ModalWithForm from "../ModalWithForm/ModalWithForm";
 import "./LoginModal.css";
+import PropTypes from "prop-types";
 
 const LoginModal = ({ isOpen, onClose, onLogin, onRegister }) => {
   const [email, setEmail] = useState("");
@@ -75,6 +76,13 @@ const LoginModal = ({ isOpen, onClose, onLogin, onRegister }) => {
       </div>
     </ModalWithForm>
   );
+};
+
+LoginModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onLogin: PropTypes.func.isRequired, // ({email, password}) => void
+  onRegister: PropTypes.func.isRequired, // () => void
 };
 
 export default LoginModal;

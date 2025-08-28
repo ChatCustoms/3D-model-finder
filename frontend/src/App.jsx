@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import auth from "./utils/auth.js";
 import * as api from "./utils/api.js";
 import About from "./Components/About/About.jsx";
+import { updateProfile } from "./utils/api.js";
 import CurrentUserContext from "./Components/Contexts/CurrentUserContext.jsx";
 import ProtectedRoute from "./Components/ProtectedRoute.jsx";
 import LoginModal from "./Components/LoginModal/LoginModal.jsx";
@@ -103,28 +104,15 @@ function App() {
     handleModalClose();
   };
 
-  const handleUpdateUser = (userData) => {
+  const handleEditProfile = async ({ name, avatar }) => {
     const token = localStorage.getItem("jwt");
-    return updateProfile(userData, token)
-      .then((updatedUser) => {
-        setCurrentUser(updatedUser);
-        handleModalClose();
-      })
-      .catch((err) => {
-        console.error(err);
-        throw err;
-      });
-  };
-
-  const handleDelete = (cardId) => {
-    const token = localStorage.getItem("jwt");
-    api
-      .deleteCard(cardId, token)
-      .then(() => {
-        console.log("Card deleted:", cardId);
-        handleModalClose();
-      })
-      .catch(console.error);
+    if (!token) return; // optionally show a message
+    try {
+      await updateProfile({ name, avatar }, token);
+      handleModalClose();
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const openLoginModal = () => {
@@ -172,7 +160,9 @@ function App() {
                     <Profile
                       handleCardClick={handleCardClick}
                       onSignOut={handleSignOut}
-                      handlEditProfileClick={openEditProfileModal}
+                      handlEditProfileClick={() =>
+                        setActiveModal("editProfile")
+                      }
                       handleCardLike={handleCardLike}
                     />
                   </ProtectedRoute>
@@ -187,8 +177,8 @@ function App() {
           {/* Modals */}
           <ItemModal
             activeModal={activeModal}
-            selectedItem={selectedItem}
-            onClose={handleModalClose}
+            card={selectedCard}
+            onClose={() => setSelectedCard(null)}
           />
           <LoginModal
             isOpen={activeModal === "login"}
@@ -207,7 +197,7 @@ function App() {
           <EditProfileModal
             isOpen={activeModal === "editProfile"}
             onClose={handleModalClose}
-            onSubmit={handleEditProfile}
+            onUpdateUser={handleEditProfile}
           />
         </div>
       </BrowserRouter>

@@ -3,6 +3,7 @@ import logo from "../../assets/Header_logo.png";
 import { Link } from "react-router-dom";
 import { useContext } from "react";
 import CurrentUserContext from "../Contexts/CurrentUserContext.jsx";
+import PropTypes from "prop-types";
 
 function Header({ onLogin, onRegister }) {
   // Pull the actual user object out of the context wrapper
@@ -61,5 +62,10 @@ function Header({ onLogin, onRegister }) {
     </header>
   );
 }
+
+Header.propTypes = {
+  onLogin: PropTypes.func.isRequired,
+  onRegister: PropTypes.func.isRequired,
+};
 
 export default Header;

@@ -1,4 +1,5 @@
 import "./ItemModal.css";
+import PropTypes from "prop-types";
 
 function ItemModal({ activeModal, model, card, onClose, onDelete, onLike }) {
   if (activeModal !== "preview") return null;
@@ -27,10 +28,21 @@ function ItemModal({ activeModal, model, card, onClose, onDelete, onLike }) {
         )}
 
         {onLike && <button onClick={() => onLike(item._id)}>❤️ Like</button>}
-        {onDelete && <button onClick={() => onDelete(item._id)}>🗑 Delete</button>}
+        {onDelete && (
+          <button onClick={() => onDelete(item._id)}>🗑 Delete</button>
+        )}
       </div>
     </div>
   );
 }
+
+ItemModal.propTypes = {
+  activeModal: PropTypes.bool.isRequired,
+  model: PropTypes.object, // if you really use `model`, otherwise drop this prop
+  card: PropTypes.object, // the selected item/card (can be null when closed)
+  onClose: PropTypes.func.isRequired,
+  onDelete: PropTypes.func, // optional
+  onLike: PropTypes.func, // optional
+};
 
 export default ItemModal;

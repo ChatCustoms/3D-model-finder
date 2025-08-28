@@ -1,6 +1,7 @@
 import { useState } from "react";
 import ModalWithForm from "../ModalWithForm/ModalWithForm";
 import "./RegisterModal.css";
+import PropTypes from "prop-types";
 
 const RegisterModal = ({ isOpen, onClose, onRegister, onLogin }) => {
   const [name, setName] = useState("");
@@ -101,6 +102,13 @@ const RegisterModal = ({ isOpen, onClose, onRegister, onLogin }) => {
       </div>
     </ModalWithForm>
   );
+};
+
+RegisterModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onRegister: PropTypes.func.isRequired, // ({name,email,password}) => void
+  onLogin: PropTypes.func.isRequired, // () => void
 };
 
 export default RegisterModal;

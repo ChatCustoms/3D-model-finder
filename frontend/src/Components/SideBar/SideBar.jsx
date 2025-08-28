@@ -2,6 +2,7 @@ import { useContext } from "react";
 import CurrentUserContext from "../Contexts/CurrentUserContext";
 import "./SideBar.css";
 import { Link } from "react-router-dom";
+import PropTypes from "prop-types";
 
 const SideBar = ({ onEditProfile, onSignOut }) => {
   const currentUser = useContext(CurrentUserContext);
@@ -24,6 +25,11 @@ const SideBar = ({ onEditProfile, onSignOut }) => {
       </div>
     </div>
   );
+};
+
+SideBar.propTypes = {
+  onEditProfile: PropTypes.func.isRequired,
+  onSignOut: PropTypes.func.isRequired,
 };
 
 export default SideBar;

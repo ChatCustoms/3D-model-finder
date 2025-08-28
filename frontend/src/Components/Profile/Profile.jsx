@@ -1,18 +1,16 @@
 import "./Profile.css";
-import { useContext, useState, useEffect } from "react";
-import CurrentUserContext from "../Contexts/CurrentUserContext.jsx";
+import { useState } from "react";
 import SideBar from "../SideBar/SideBar.jsx";
 import ItemCard from "../ItemCard/ItemCard.jsx";
 import { searchModels } from "../../utils/ThingiverseAPI";
+import PropTypes from "prop-types";
 
 function Profile({
   handleCardClick,
-  handleAddClick,
   onSignOut,
   handlEditProfileClick,
   handleCardLike,
 }) {
-  const currentUser = useContext(CurrentUserContext);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [likedModels, setLikedModels] = useState([]);
@@ -91,14 +89,14 @@ function Profile({
                 ))}
               </ul>
             ) : searchTerm ? (
-              <p>No results found for "{searchTerm}".</p>
+              <p>No results found for &quot;{searchTerm}&quot;.</p>
             ) : null}
           </div>
 
           <div className="profile__liked">
             <h2>Liked Models</h2>
             {likedModels.length === 0 ? (
-              <p>You haven't liked any models yet.</p>
+              <p>&quot;You haven&apos;t liked any models yet.&quot;</p>
             ) : (
               <ul className="cards__list">
                 {likedModels.map((item) => (
@@ -117,5 +115,13 @@ function Profile({
     </div>
   );
 }
+
+Profile.propTypes = {
+  handleCardClick: PropTypes.func.isRequired,
+  handleAddClick: PropTypes.func, // make optional if you might remove it
+  onSignOut: PropTypes.func.isRequired,
+  handlEditProfileClick: PropTypes.func.isRequired, // if this is a typo, fix the prop/caller
+  handleCardLike: PropTypes.func.isRequired,
+};
 
 export default Profile;

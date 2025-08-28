@@ -1,6 +1,8 @@
 import { useContext, useEffect, useState } from "react";
 import ModalWithForm from "../ModalWithForm/ModalWithForm";
 import CurrentUserContext from "../Contexts/CurrentUserContext";
+import PropTypes from "prop-types";
+import "./EditProfileModal.css";
 
 const EditProfileModal = ({ isOpen, onClose, onUpdateUser }) => {
   const currentUser = useContext(CurrentUserContext);
@@ -58,6 +60,12 @@ const EditProfileModal = ({ isOpen, onClose, onUpdateUser }) => {
       </button>
     </ModalWithForm>
   );
+};
+
+EditProfileModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onUpdateUser: PropTypes.func.isRequired,
 };
 
 export default EditProfileModal;

@@ -1,4 +1,5 @@
 import "./ItemCard.css";
+import PropTypes from "prop-types";
 
 function ItemCard({ item, onCardLike, onCardClick }) {
   const handleLike = () => {
@@ -15,5 +16,16 @@ function ItemCard({ item, onCardLike, onCardClick }) {
     </li>
   );
 }
+
+ItemCard.propTypes = {
+  item: PropTypes.shape({
+    _id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    name: PropTypes.string.isRequired,
+    image: PropTypes.string, // url
+    liked: PropTypes.bool,
+  }).isRequired,
+  onCardLike: PropTypes.func.isRequired, // (item) => void
+  onCardClick: PropTypes.func.isRequired, // (item) => void
+};
 
 export default ItemCard;

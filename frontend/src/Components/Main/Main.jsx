@@ -3,6 +3,7 @@ import ItemCard from "../ItemCard/ItemCard";
 import ItemModal from "../ItemModal/ItemModal";
 import { useState } from "react";
 import { searchModels } from "../../utils/ThingiverseAPI";
+import PropTypes from "prop-types";
 
 import { API_BASE } from "../../utils/api";
 
@@ -95,5 +96,9 @@ function Main({ handleCardLike }) {
     </main>
   );
 }
+
+Main.propTypes = {
+  handleCardLike: PropTypes.func.isRequired,
+};
 
 export default Main;
