@@ -135,7 +135,7 @@ router.get("/api/thingiverse/things/:id", async (req, res) => {
   }
 });
 
-router.get("api/thingiverse/img", async (req, res) => {
+router.get("/api/thingiverse/img", async (req, res) => {
   try {
     const { url } = req.query;
     console.log("IMG PROXY HIT:", url);
