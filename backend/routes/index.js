@@ -168,12 +168,9 @@ router.get("/thingiverse/things/:id", async (req, res) => {
 //   }
 // });
 
-// GET /api/thingiverse/img?url=<absolute-image-url>
 router.get("/thingiverse/img", async (req, res) => {
   try {
     const { url } = req.query;
-
-    // Debug: confirm the route is being hit
     console.log("IMG PROXY HIT:", url);
 
     if (!url || !/^https?:\/\//i.test(url)) {
@@ -184,7 +181,6 @@ router.get("/thingiverse/img", async (req, res) => {
       responseType: "arraybuffer",
       timeout: 15000,
       maxRedirects: 5,
-      // Allow 2xx/3xx so CDN redirects are followed
       validateStatus: (s) => s >= 200 && s < 400,
       headers: {
         "User-Agent":
@@ -195,14 +191,11 @@ router.get("/thingiverse/img", async (req, res) => {
     });
 
     const ct = (upstream.headers["content-type"] || "image/jpeg").toString();
-
-    // Correct headers so the browser will display it
     res.setHeader("Content-Type", ct);
     res.setHeader("Cache-Control", "public, max-age=86400, immutable");
     res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
     res.setHeader("Access-Control-Allow-Origin", "*");
 
-    // Send the raw bytes
     res.status(200).end(Buffer.from(upstream.data), "binary");
   } catch (err) {
     console.error("Image proxy error:", err?.response?.status || err.message);
