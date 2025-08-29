@@ -15,6 +15,11 @@ function Main({ handleCardLike }) {
   const handleCardClick = (model) => setSelectedModel(model);
   const handleCloseModal = () => setSelectedModel(null);
 
+  useEffect(() => {
+    console.log("API_BASE (from bundle):", API_BASE);
+    window.__API_BASE__ = API_BASE; // For debugging
+  }, []);
+
   const handleSearch = async (e) => {
     e.preventDefault();
     try {
@@ -96,11 +101,6 @@ function Main({ handleCardLike }) {
     </main>
   );
 }
-
-useEffect(() => {
-  console.log("API_BASE (from bundle):", API_BASE);
-  window.__API_BASE__ = API_BASE; // For debugging
-}, []);
 
 Main.propTypes = {
   handleCardLike: PropTypes.func.isRequired,
