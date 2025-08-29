@@ -16,9 +16,6 @@ import PropTypes from "prop-types";
 //   return children;
 // };
 
-// Components/ProtectedRoute.jsx
-import { Navigate, useLocation } from "react-router-dom";
-
 export default function ProtectedRoute(props) {
   const { loggedIn, children } = props;
   console.log("ProtectedRoute props:", props); // <-- should show { loggedIn: true/false, children: ... }
