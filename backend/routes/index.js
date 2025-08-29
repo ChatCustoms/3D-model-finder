@@ -74,6 +74,8 @@ router.get("/thingiverse/ping", (_req, res) => {
   res.type("text/plain").send("ok-img");
 });
 
+app.get("/api/thingiverse/img", proxyImage);
+
 // ---------- Thingiverse search proxy ----------
 router.get("/thingiverse/search", async (req, res) => {
   try {
