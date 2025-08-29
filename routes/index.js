@@ -50,6 +50,7 @@ router.get("/thingiverse/img", async (req, res) => {
 // ---------- AUTH ----------
 const JWT_SECRET = process.env.JWT_SECRET || "dev-secret";
 
+// --- Signup ---
 router.post("/signup", async (req, res) => {
   try {
     const { name, email, password, avatarUrl, avatar } = req.body || {};
@@ -59,9 +60,8 @@ router.post("/signup", async (req, res) => {
     }
 
     const existing = await User.findOne({ email });
-    if (existing) {
+    if (existing)
       return res.status(409).json({ error: "Email already registered" });
-    }
 
     const hash = await bcrypt.hash(password, 10);
 
@@ -69,7 +69,7 @@ router.post("/signup", async (req, res) => {
       name,
       email,
       password: hash,
-      // 👇 satisfy the schema's required `avatar`
+      // satisfy schema's required `avatar` while keeping client prop name
       avatar: avatar ?? avatarUrl ?? "",
     });
 
@@ -77,13 +77,13 @@ router.post("/signup", async (req, res) => {
       expiresIn: "7d",
     });
 
-    return res.json({
+    res.json({
       token,
       user: {
         id: user._id,
         name: user.name,
         email: user.email,
-        avatarUrl: user.avatar, // keep naming consistent for the client
+        avatarUrl: user.avatar, // return avatarUrl for the frontend
       },
     });
   } catch (err) {
@@ -96,17 +96,14 @@ router.post("/signup", async (req, res) => {
   }
 });
 
-// Sign in
+// --- Signin ---
 router.post("/signin", async (req, res) => {
   try {
     const { email, password } = req.body || {};
-    if (!email || !password) {
-      return res.status(400).json({ error: "email and password are required" });
-    }
+    if (!email || !password)
+      return res.status(400).json({ error: "Missing email or password" });
 
-    const user = await User.findOne({ email: email.toLowerCase() }).select(
-      "+password"
-    );
+    const user = await User.findOne({ email }).select("+password");
     if (!user)
       return res.status(401).json({ error: "Invalid email or password" });
 
@@ -114,19 +111,65 @@ router.post("/signin", async (req, res) => {
     if (!ok)
       return res.status(401).json({ error: "Invalid email or password" });
 
-    const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: "7d" });
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
+    // set httpOnly cookie for cross-site (Netlify → DuckDNS)
+    res.cookie("token", token, {
+      httpOnly: true,
+      sameSite: "None",
+      secure: true,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
     res.json({
       token,
       user: {
-        _id: user._id,
+        id: user._id,
         name: user.name,
         email: user.email,
-        avatarUrl: user.avatarUrl || "",
+        avatarUrl: user.avatar,
       },
     });
   } catch (err) {
-    console.error("Signin error:", err.message);
+    console.error("Signin error:", err);
     res.status(500).json({ error: "Signin failed" });
+  }
+});
+
+// Small helper to read token from Authorization: Bearer <token> OR cookie
+function getToken(req) {
+  const h = req.headers.authorization || "";
+  if (h.startsWith("Bearer ")) return h.slice(7);
+  return req.cookies?.token || null;
+}
+
+// --- Me (protected) ---
+router.get("/users/me", async (req, res) => {
+  try {
+    const token = getToken(req);
+    if (!token) return res.status(401).json({ error: "Auth required" });
+
+    let payload;
+    try {
+      payload = jwt.verify(token, process.env.JWT_SECRET);
+    } catch {
+      return res.status(401).json({ error: "Invalid token" });
+    }
+
+    const user = await User.findById(payload.id);
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    res.json({
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      avatarUrl: user.avatar,
+    });
+  } catch (err) {
+    console.error("Me error:", err);
+    res.status(500).json({ error: "Failed to load user" });
   }
 });
 
