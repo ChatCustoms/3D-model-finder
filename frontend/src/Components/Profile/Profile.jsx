@@ -96,7 +96,7 @@ function Profile({
           <div className="profile__liked">
             <h2>Liked Models</h2>
             {likedModels.length === 0 ? (
-              <p>&quot;You haven&apos;t liked any models yet.&quot;</p>
+              <p>You haven&apos;t liked any models yet</p>
             ) : (
               <ul className="cards__list">
                 {likedModels.map((item) => (

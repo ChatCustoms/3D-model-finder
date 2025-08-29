@@ -15,7 +15,7 @@ const SideBar = ({ onEditProfile, onSignOut }) => {
           Edit Profile
         </button>
 
-        <Link to="/about" className="sidebar__edit-button">
+        <Link to="/about" className="sidebar__aboutme-button">
           About Me
         </Link>
 

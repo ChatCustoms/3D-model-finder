@@ -41,7 +41,7 @@
   color: #000;
 }
 
-.sidebar__edit-button,
+.sidebar__edit-button, .sidebar__aboutme-button,
 .sidebar__signout-button {
   background: none;
   border: none;
@@ -52,6 +52,7 @@
   padding: 0;
   text-align: left;
   color: #ffffff;
+  margin-top: 20px;
 }
 
 .sidebar__signout-button {
