@@ -1,18 +1,35 @@
 import { Navigate, useLocation } from "react-router-dom";
 import PropTypes from "prop-types";
 
-const ProtectedRoute = ({ children, loggedIn }) => {
-  const location = useLocation();
-  console.log("ProtectedRoute - props", props);
+// const ProtectedRoute = ({ children, loggedIn }) => {
+//   const location = useLocation();
+//   console.log("ProtectedRoute - loggedIn:", loggedIn);
 
-  if (loggedIn === undefined || loggedIn === null) {
-    return null;
-  }
+//   if (loggedIn === undefined || loggedIn === null) {
+//     return null;
+//   }
+
+//   if (!loggedIn) {
+//     return <Navigate to="/" replace state={{ from: location }} />;
+//   }
+
+//   return children;
+// };
+
+// Components/ProtectedRoute.jsx
+import { Navigate, useLocation } from "react-router-dom";
+
+export default function ProtectedRoute(props) {
+  const { loggedIn, children } = props;
+  console.log("ProtectedRoute props:", props); // <-- should show { loggedIn: true/false, children: ... }
+
+  // handle loading/null
+  if (loggedIn === undefined || loggedIn === null) return null;
 
   if (!loggedIn) {
-    return <Navigate to="/" replace state={{ from: location }} />;
+    const loc = useLocation();
+    return <Navigate to="/" replace state={{ from: loc }} />;
   }
-
   return children;
 };
 
@@ -21,4 +38,4 @@ ProtectedRoute.propTypes = {
   loggedIn: PropTypes.bool,
 };
 
-export default ProtectedRoute;
+// export default ProtectedRoute;
