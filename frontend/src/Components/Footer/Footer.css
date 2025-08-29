@@ -7,14 +7,16 @@
 
 .footer > .content-box {
   width: 100%;
-  text-align: center;
+  background-color: rgba(0, 0, 0, 0.3);
+  display: flex;
+  justify-content: space-between;
 }
 
 .footer__name {
   font-weight: 500;
   font-size: 16px;
   line-height: 20px;
-  color: #000000;
+  color: #ffffff;
   font-family: "cabinet Grotesk", sans-serif;
 }
 
@@ -22,6 +24,6 @@
   font-weight: 500;
   font-size: 16px;
   line-height: 20px;
-  color: #000000;
+  color: #ffffff;
   font-family: "cabinet Grotesk", sans-serif;
 }
