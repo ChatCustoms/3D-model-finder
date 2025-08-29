@@ -7,7 +7,7 @@
 
 .footer > .content-box {
   width: 100%;
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: rgba(0, 0, 0, 0.45);
   display: flex;
   justify-content: space-between;
 }

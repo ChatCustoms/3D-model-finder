@@ -51,8 +51,9 @@
   cursor: pointer;
   padding: 0;
   text-align: left;
+  color: #ffffff;
 }
 
 .sidebar__signout-button {
-  color: #ff4d00;
+  color: #ffffff;
 }
