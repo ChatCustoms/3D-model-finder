@@ -160,6 +160,7 @@ function App() {
                 element={
                   <ProtectedRoute isLoggedIn={loggedIn}>
                     <Profile
+                      loggedIn={loggedIn}
                       handleCardClick={handleCardClick}
                       onSignOut={handleSignOut}
                       handlEditProfileClick={() =>

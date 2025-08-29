@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 
 const ProtectedRoute = ({ children, loggedIn }) => {
   const location = useLocation();
-  console.log("ProtectedRoute - loggedIn:", loggedIn);
+  console.log("ProtectedRoute - props", props);
 
   if (loggedIn === undefined || loggedIn === null) {
     return null;
