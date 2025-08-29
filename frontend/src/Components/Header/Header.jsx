@@ -45,7 +45,7 @@ function Header({ onLogin, onRegister }) {
           </button>
         </div>
       ) : (
-        <Link to="/profile" className="header__user-container">
+        <Link to="/profile" className="content-box header__user-container">
           <p className="header__username">{displayName || "Profile"}</p>
           {avatarUrl ? (
             <img
