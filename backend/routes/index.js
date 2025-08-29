@@ -68,7 +68,7 @@ router.patch("/users/me", auth, async (req, res) => {
   }
 });
 
-router.get("/test", (_req, res) => res.send("Test route works!"));
+router.get("/test", (_req, res) => res.send("Test route v2 works!"));
 
 router.get("/thingiverse/ping", (_req, res) => {
   res.type("text/plain").send("ok-img");
