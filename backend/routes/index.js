@@ -74,10 +74,8 @@ router.get("/thingiverse/ping", (_req, res) => {
   res.type("text/plain").send("ok-img");
 });
 
-app.get("/api/thingiverse/img", proxyImage);
-
 // ---------- Thingiverse search proxy ----------
-router.get("/thingiverse/search", async (req, res) => {
+router.get("/api/thingiverse/search", async (req, res) => {
   try {
     const { q, type = "things", page = 1 } = req.query;
     if (!q) return res.status(400).json({ message: "Missing query param q" });
@@ -109,7 +107,7 @@ router.get("/thingiverse/search", async (req, res) => {
 });
 
 // ---------- Thing details ----------
-router.get("/thingiverse/things/:id", async (req, res) => {
+router.get("/api/thingiverse/things/:id", async (req, res) => {
   try {
     const accessToken = process.env.THINGIVERSE_TOKEN;
     if (!accessToken) {
@@ -137,7 +135,7 @@ router.get("/thingiverse/things/:id", async (req, res) => {
   }
 });
 
-router.get("/thingiverse/img", async (req, res) => {
+router.get("api/thingiverse/img", async (req, res) => {
   try {
     const { url } = req.query;
     console.log("IMG PROXY HIT:", url);
