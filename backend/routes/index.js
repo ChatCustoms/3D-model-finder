@@ -135,39 +135,6 @@ router.get("/thingiverse/things/:id", async (req, res) => {
   }
 });
 
-// ---------- Image proxy (so images load over HTTPS with proper headers) ----------
-// router.get("/thingiverse/img", async (req, res) => {
-//   try {
-//     const { url } = req.query;
-//     if (!url) return res.status(400).send("Missing url");
-
-//     const upstream = await axios.get(url, {
-//       responseType: "arraybuffer",
-//       timeout: 10000,
-//       headers: {
-//         // present as a regular browser
-//         "User-Agent":
-//           "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
-//         Accept: "image/avif,image/webp,image/apng,image/*,*/*;q=0.8",
-//         Referer: "https://www.thingiverse.com/",
-//       },
-//       validateStatus: (s) => s >= 200 && s < 400,
-//     });
-
-//     const ct = upstream.headers["content-type"]?.toString() || "image/jpeg";
-
-//     res.setHeader("Content-Type", ct);
-//     res.setHeader("Cache-Control", "public, max-age=86400, immutable");
-
-//     res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
-//     res.setHeader("Access-Control-Allow-Origin", "*");
-
-//     res.send(Buffer.from(upstream.data));
-//   } catch (err) {
-//     res.status(502).send("Image fetch failed");
-//   }
-// });
-
 router.get("/thingiverse/img", async (req, res) => {
   try {
     const { url } = req.query;
@@ -191,6 +158,7 @@ router.get("/thingiverse/img", async (req, res) => {
     });
 
     const ct = (upstream.headers["content-type"] || "image/jpeg").toString();
+
     res.setHeader("Content-Type", ct);
     res.setHeader("Cache-Control", "public, max-age=86400, immutable");
     res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
