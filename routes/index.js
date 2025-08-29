@@ -2,68 +2,49 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const axios = require("axios");
 const User = require("../models/user");
 const auth = require("../middlewares/auth");
 
-
-// Register
-router.post("/signup", async (req, res) => {
-  const { name, avatar, email, password } = req.body;
-  const hash = await bcrypt.hash(password, 10);
-  try {
-    const user = await User.create({ name, avatar, email, password: hash });
-    res
-      .status(201)
-      .send({
-        name: user.name,
-        avatar: user.avatar,
-        email: user.email,
-        _id: user._id,
-      });
-  } catch (err) {
-    res
-      .status(400)
-      .send({ message: "User creation failed", error: err.message });
-  }
+// --- Test (bump to V2) ---
+router.get("/test", (_req, res) => {
+  res.send("Test route V2 works!");
 });
 
-// Login
-router.post("/signin", async (req, res) => {
-  const { email, password } = req.body;
+// --- Thingiverse ping (debug) ---
+router.get("/thingiverse/ping", (_req, res) => {
+  res.type("text/plain").send("ok-img");
+});
+
+// --- Thingiverse image proxy ---
+router.get("/thingiverse/img", async (req, res) => {
   try {
-    const user = await User.findUserByCredentials(email, password);
-    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
+    const { url } = req.query;
+    if (!url || !/^https?:\/\//i.test(url)) {
+      return res.status(400).send("Missing or invalid url");
+    }
+
+    const upstream = await axios.get(url, {
+      responseType: "arraybuffer",
+      timeout: 15000,
+      maxRedirects: 5,
+      validateStatus: (s) => s >= 200 && s < 400,
+      headers: {
+        "User-Agent": "Mozilla/5.0",
+        Accept: "image/avif,image/webp,image/apng,image/*,*/*;q=0.8",
+        Referer: "https://www.thingiverse.com/",
+      },
     });
-    res.send({ token });
+
+    const ct = (upstream.headers["content-type"] || "image/jpeg").toString();
+    res.setHeader("Content-Type", ct);
+    res.setHeader("Cache-Control", "public, max-age=86400, immutable");
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+    res.status(200).end(Buffer.from(upstream.data), "binary");
   } catch (err) {
-    res.status(401).send({ message: "Login failed" });
-  }
-});
-
-// Get user profile
-router.get("/users/me", auth, async (req, res) => {
-  const user = await User.findById(req.user._id);
-  if (!user) return res.status(404).send({ message: "User not found" });
-  res.send(user);
-});
-
-router.get("/test", (req, res) => {
-  res.send("Test route works!");
-});
-
-// Update profile
-router.patch("/users/me", auth, async (req, res) => {
-  const { name, avatar } = req.body;
-  try {
-    const updated = await User.findByIdAndUpdate(
-      req.user._id,
-      { name, avatar },
-      { new: true, runValidators: true }
-    );
-    res.send(updated);
-  } catch (err) {
-    res.status(400).send({ message: "Update failed" });
+    console.error("Image proxy error:", err?.response?.status || err.message);
+    res.status(502).send("Image fetch failed");
   }
 });
 
