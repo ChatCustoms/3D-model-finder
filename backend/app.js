@@ -10,7 +10,11 @@ const errorHandler = require("./middlewares/errorHandler");
 const app = express();
 
 app.set("trust proxy", 1);
-app.use(helmet());
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+  })
+);
 app.use(express.json());
 
 // CORS allow-list

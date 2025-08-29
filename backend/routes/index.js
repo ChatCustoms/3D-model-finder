@@ -154,6 +154,10 @@ router.get("/thingiverse/img", async (req, res) => {
 
     res.setHeader("Content-Type", ct);
     res.setHeader("Cache-Control", "public, max-age=86400, immutable");
+
+    res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+    res.setHeader("Access-Control-Allow-Origin", "*");
+
     res.send(Buffer.from(upstream.data));
   } catch (err) {
     res.status(502).send("Image fetch failed");
