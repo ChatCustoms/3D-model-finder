@@ -1,7 +1,7 @@
 import "./Main.css";
 import ItemCard from "../ItemCard/ItemCard";
 import ItemModal from "../ItemModal/ItemModal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { searchModels } from "../../utils/ThingiverseAPI";
 import PropTypes from "prop-types";
 
@@ -96,6 +96,11 @@ function Main({ handleCardLike }) {
     </main>
   );
 }
+
+useEffect(() => {
+  console.log("API_BASE (from bundle):", API_BASE);
+  window.__API_BASE__ = API_BASE; // For debugging
+}, []);
 
 Main.propTypes = {
   handleCardLike: PropTypes.func.isRequired,
