@@ -6,7 +6,17 @@ const axios = require("axios");
 const User = require("../models/user");
 const auth = require("../middlewares/auth");
 
-// --- Test (bump to V2) ---
+// ---------- Thingiverse axios client ----------
+const THINGIVERSE_TOKEN = process.env.THINGIVERSE_TOKEN || "";
+const tv = axios.create({
+  baseURL: "https://api.thingiverse.com",
+  headers: THINGIVERSE_TOKEN
+    ? { Authorization: `Bearer ${THINGIVERSE_TOKEN}` }
+    : {},
+  timeout: 15000,
+});
+
+// --- Test (V2) ---
 router.get("/test", (_req, res) => {
   res.send("Test route V2 works!");
 });
@@ -45,6 +55,34 @@ router.get("/thingiverse/img", async (req, res) => {
   } catch (err) {
     console.error("Image proxy error:", err?.response?.status || err.message);
     res.status(502).send("Image fetch failed");
+  }
+});
+
+// --- Thingiverse search ---
+// /api/thingiverse/search?q=car&type=things&page=1
+router.get("/thingiverse/search", async (req, res) => {
+  try {
+    const { q = "", type = "things", page = 1 } = req.query;
+    const r = await tv.get("/search", { params: { q, type, page } });
+    res.json(r.data);
+  } catch (err) {
+    const status = err?.response?.status || 502;
+    console.error("Thingiverse /search error:", status, err.message);
+    res.status(502).json({ error: "search failed" });
+  }
+});
+
+// --- Thingiverse thing details ---
+// /api/thingiverse/things/:id
+router.get("/thingiverse/things/:id", async (req, res) => {
+  try {
+    const id = encodeURIComponent(req.params.id);
+    const r = await tv.get(`/things/${id}`);
+    res.json(r.data);
+  } catch (err) {
+    const status = err?.response?.status || 502;
+    console.error("Thingiverse /things/:id error:", status, err.message);
+    res.status(502).json({ error: "thing fetch failed" });
   }
 });
 
