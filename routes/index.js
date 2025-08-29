@@ -50,41 +50,49 @@ router.get("/thingiverse/img", async (req, res) => {
 // ---------- AUTH ----------
 const JWT_SECRET = process.env.JWT_SECRET || "dev-secret";
 
-// Sign up
 router.post("/signup", async (req, res) => {
   try {
-    const { name, email, password, avatarUrl } = req.body || {};
+    const { name, email, password, avatarUrl, avatar } = req.body || {};
+
     if (!name || !email || !password) {
-      return res
-        .status(400)
-        .json({ error: "name, email, and password are required" });
+      return res.status(400).json({ error: "Missing name, email or password" });
     }
 
-    const existing = await User.findOne({ email: email.toLowerCase() });
-    if (existing)
-      return res.status(409).json({ error: "Email is already registered" });
+    const existing = await User.findOne({ email });
+    if (existing) {
+      return res.status(409).json({ error: "Email already registered" });
+    }
 
     const hash = await bcrypt.hash(password, 10);
+
     const user = await User.create({
       name,
-      email: email.toLowerCase(),
+      email,
       password: hash,
-      avatarUrl: avatarUrl || "",
+      // 👇 satisfy the schema's required `avatar`
+      avatar: avatar ?? avatarUrl ?? "",
     });
 
-    const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: "7d" });
-    res.status(201).json({
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
+    return res.json({
       token,
       user: {
-        _id: user._id,
+        id: user._id,
         name: user.name,
         email: user.email,
-        avatarUrl: user.avatarUrl || "",
+        avatarUrl: user.avatar, // keep naming consistent for the client
       },
     });
   } catch (err) {
-    console.error("Signup error:", err.message);
-    res.status(500).json({ error: "Signup failed" });
+    console.error("Signup error:", err);
+    if (err?.code === 11000)
+      return res.status(409).json({ error: "Email already registered" });
+    if (err?.name === "ValidationError")
+      return res.status(400).json({ error: err.message });
+    return res.status(500).json({ error: "Signup failed" });
   }
 });
 
