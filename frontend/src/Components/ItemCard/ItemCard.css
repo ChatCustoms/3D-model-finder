@@ -1,0 +1,29 @@
+.item-card {
+  border: 1px solid #ccc;
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+  background-color: #f9f9f9;
+}
+
+.item-card__image {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.item-card__title {
+  font-size: 1.1rem;
+  margin: 0.75rem 0;
+}
+
+.item-card__like-btn {
+  background-color: #002147;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border-radius: 4px;
+}

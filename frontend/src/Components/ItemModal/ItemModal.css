@@ -1,0 +1,60 @@
+/* Overlay covers full screen */
+.item-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Modal box */
+.item-modal {
+  background-color: white;
+  padding: 24px;
+  border-radius: 8px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  max-width: 500px;
+  width: 90%;
+  z-index: 1001;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Optional styling for inside */
+.item-modal img {
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+  margin-bottom: 16px;
+}
+
+.item-modal h2 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.item-modal p {
+  text-align: left;
+  margin-bottom: 12px;
+}
+
+.item-modal a {
+  margin-bottom: 12px;
+  color: #007bff;
+  text-decoration: underline;
+}
+
+.item-modal button {
+  margin: 28px 0 0 0;
+  padding: 8px 16px;
+  cursor: pointer;
+}

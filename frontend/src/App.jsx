@@ -1,0 +1,211 @@
+import { useEffect, useState } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+import auth from "./utils/auth.js";
+import * as api from "./utils/api.js";
+import About from "./Components/About/About.jsx";
+import { updateProfile } from "./utils/api.js";
+import CurrentUserContext from "./Components/Contexts/CurrentUserContext.jsx";
+import ProtectedRoute from "./Components/ProtectedRoute.jsx";
+import LoginModal from "./Components/LoginModal/LoginModal.jsx";
+import RegisterModal from "./Components/RegisterModal/RegisterModal.jsx";
+import EditProfileModal from "./Components/EditProfileModal/EditProfileModal.jsx";
+import Header from "./Components/Header/Header.jsx";
+import Footer from "./Components/Footer/Footer.jsx";
+import Main from "./Components/Main/Main.jsx";
+import Profile from "./Components/Profile/Profile.jsx";
+import ItemModal from "./Components/ItemModal/ItemModal.jsx";
+import { login, checkToken } from "./utils/auth.js";
+
+function App() {
+  const [currentUser, setCurrentUser] = useState(null);
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [activeModal, setActiveModal] = useState(null);
+  const [selectedCard, setSelectedCard] = useState(null);
+
+  const handleCardClick = (card) => {
+    setSelectedCard(card);
+    setActiveModal("preview");
+  };
+
+  const handleModalClose = () => {
+    setActiveModal("");
+  };
+
+  const handleLogin = async (email, password) => {
+    // throws on error if your helper rejects on !res.ok
+    const { token } = await login({ email, password });
+    localStorage.setItem("jwt", token);
+
+    const user = await checkToken(token); // GET /api/users/me
+    setCurrentUser(user);
+    setLoggedIn(true);
+    // close modal, navigate, etc.
+    handleModalClose();
+
+    return token; // return something so callers can await if they want
+  };
+
+  const handleRegister = ({ name, avatar, email, password }) => {
+    return auth
+      .register({ name, avatar, email, password })
+      .then(() => {
+        return auth.login({ email, password });
+      })
+      .then((data) => {
+        localStorage.setItem("jwt", data.token);
+        return auth.checkToken(data.token);
+      })
+      .then((userData) => {
+        setCurrentUser(userData);
+        setLoggedIn(true);
+        handleModalClose();
+      });
+  };
+
+  const handleCardLike = (item = {}) => {
+    const token = localStorage.getItem("jwt");
+
+    if (!currentUser || !currentUser._id || !token) {
+      console.error("User not logged in or token missing");
+      return;
+    }
+
+    // Accept both shapes: Thingiverse search results (id) and normalized (_id)
+    const externalId =
+      item?._id ?? item?.id ?? item?.thing_id ?? item?.thingId ?? null;
+
+    if (!externalId) {
+      console.warn("No externalId found on item:", item);
+      return; // prevent /items/undefined/likes
+    }
+
+    // Likes array may not exist for raw search results — default to []
+    const likes = Array.isArray(item.likes) ? item.likes : [];
+    const isLiked = likes.includes(currentUser._id);
+
+    // Use POST to like, DELETE to unlike (avoid PUT that your server doesn't implement)
+    const request = isLiked ? api.removeCardLike : api.addCardLike;
+
+    request(externalId, token)
+      .then((updated) => {
+        console.log("Card updated successfully:", updated);
+        // TODO: update UI state if needed (e.g., refetch or optimistic update)
+      })
+      .catch((err) => {
+        console.error("Like toggle failed:", err);
+      });
+  };
+
+  const handleSignOut = () => {
+    localStorage.removeItem("jwt");
+    setCurrentUser(null);
+    setLoggedIn(false);
+    handleModalClose();
+  };
+
+  const handleEditProfile = async ({ name, avatar }) => {
+    const token = localStorage.getItem("jwt");
+    if (!token) return; // optionally show a message
+    try {
+      await updateProfile({ name, avatar }, token);
+      handleModalClose();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const openLoginModal = () => {
+    setActiveModal("login");
+  };
+
+  const openRegisterModal = () => {
+    setActiveModal("register");
+  };
+
+  useEffect(() => {
+    const token = localStorage.getItem("jwt");
+    if (token) {
+      setLoggedIn(false);
+      return;
+    }
+    auth
+      .checkToken(token)
+      .then((user) => {
+        setCurrentUser(user);
+        setLoggedIn(true);
+      })
+      .catch((err) => {
+        console.error("Invalid token:", err);
+        localStorage.removeItem("jwt");
+        setCurrentUser(null);
+        setLoggedIn(false);
+      });
+  }, []);
+
+  return (
+    <CurrentUserContext.Provider value={{ currentUser, setCurrentUser }}>
+      <BrowserRouter basename="/">
+        <div className="app">
+          <Header onLogin={openLoginModal} onRegister={openRegisterModal} />
+
+          <main className="container">
+            <Routes>
+              <Route
+                path="/"
+                element={<Main handleCardLike={handleCardLike} />}
+              />
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute loggedIn={loggedIn}>
+                    <Profile
+                      loggedIn={loggedIn}
+                      handleCardClick={handleCardClick}
+                      onSignOut={handleSignOut}
+                      handlEditProfileClick={() =>
+                        setActiveModal("editProfile")
+                      }
+                      handleCardLike={handleCardLike}
+                    />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="/about" element={<About />} />
+            </Routes>
+          </main>
+
+          <Footer />
+
+          {/* Modals */}
+          <ItemModal
+            activeModal={activeModal}
+            card={selectedCard}
+            onClose={() => setSelectedCard(null)}
+          />
+          <LoginModal
+            isOpen={activeModal === "login"}
+            onOpen={openLoginModal}
+            onClose={handleModalClose}
+            onLogin={handleLogin}
+            onRegister={openRegisterModal}
+          />
+          <RegisterModal
+            isOpen={activeModal === "register"}
+            onOpen={openRegisterModal}
+            onClose={handleModalClose}
+            onRegister={handleRegister}
+            onLogin={openLoginModal}
+          />
+          <EditProfileModal
+            isOpen={activeModal === "editProfile"}
+            onClose={handleModalClose}
+            onUpdateUser={handleEditProfile}
+          />
+        </div>
+      </BrowserRouter>
+    </CurrentUserContext.Provider>
+  );
+}
+
+export default App;

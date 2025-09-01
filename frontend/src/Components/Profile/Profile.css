@@ -1,0 +1,115 @@
+.profile {
+  display: flex;
+  gap: 40px;
+  font-family: "Cabinet Grotesk", sans-serif;
+}
+
+.profile__sidebar {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+}
+
+.profile__sidebar button {
+  margin-top: 10px;
+  display: block;
+  width: 100%;
+  text-align: left;
+}
+
+.profile__user_info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.profile__avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.profile__avatar-placeholder {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: #ccc;
+  color: #fff;
+  font-size: 32px;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.profile__name {
+  margin: 16px 0;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.profile__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.profile__edit-button,
+.profile__signout-button {
+  border: none;
+  background: none;
+  color: black;
+  font-size: 16px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.profile__main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  color: #ffffff;
+}
+
+.profile__menu {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.profile__items-title {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.profile__add-button {
+  background: none;
+  border: none;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.profile__search-form {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.profile__results,
+.profile__liked {
+  margin-top: 20px;
+}
+
+.cards__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  list-style: none;
+  padding: 0;
+}
