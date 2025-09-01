@@ -7,12 +7,9 @@ const axios = require("axios");
 
 const User = require("../models/user");
 const auth = require("../middlewares/auth");
-const {
-  likeByExternalId,
-  unlikeByExternalId,
-} = require("../controllers/likes");
+const thingiverseRoutes = require("./thingiverse");
 
-// ---------- Auth & Users ----------
+// ---------- Auth ----------
 router.post("/signup", async (req, res) => {
   const { name, avatar, email, password } = req.body;
   try {
@@ -30,10 +27,6 @@ router.post("/signup", async (req, res) => {
       .send({ message: "User creation failed", error: err.message });
   }
 });
-
-// ---------- Likes (by external Thingiverse id) ----------
-router.post("/items/:externalId/likes", auth, likeByExternalId);
-router.delete("/items/:externalId/likes", auth, unlikeByExternalId);
 
 router.post("/signin", async (req, res) => {
   const { email, password } = req.body;
@@ -68,14 +61,16 @@ router.patch("/users/me", auth, async (req, res) => {
   }
 });
 
-router.get("/test", (_req, res) => res.send("Test route v2 works!"));
+router.get("/test", (_req, res) => res.send("Test route V2 works!"));
+router.use("/thingiverse", thingiverseRoutes);
 
+// ---------- Thingiverse: quick ping ----------
 router.get("/thingiverse/ping", (_req, res) => {
   res.type("text/plain").send("ok-img");
 });
 
 // ---------- Thingiverse search proxy ----------
-router.get("/api/thingiverse/search", async (req, res) => {
+router.get("/thingiverse/search", async (req, res) => {
   try {
     const { q, type = "things", page = 1 } = req.query;
     if (!q) return res.status(400).json({ message: "Missing query param q" });
@@ -107,7 +102,7 @@ router.get("/api/thingiverse/search", async (req, res) => {
 });
 
 // ---------- Thing details ----------
-router.get("/api/thingiverse/things/:id", async (req, res) => {
+router.get("/thingiverse/things/:id", async (req, res) => {
   try {
     const accessToken = process.env.THINGIVERSE_TOKEN;
     if (!accessToken) {
@@ -135,11 +130,10 @@ router.get("/api/thingiverse/things/:id", async (req, res) => {
   }
 });
 
-router.get("/api/thingiverse/img", async (req, res) => {
+// ---------- Image proxy (binary) ----------
+router.get("/thingiverse/img", async (req, res) => {
   try {
     const { url } = req.query;
-    console.log("IMG PROXY HIT:", url);
-
     if (!url || !/^https?:\/\//i.test(url)) {
       return res.status(400).send("Missing or invalid url");
     }
@@ -151,7 +145,7 @@ router.get("/api/thingiverse/img", async (req, res) => {
       validateStatus: (s) => s >= 200 && s < 400,
       headers: {
         "User-Agent":
-          "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36",
+          "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome Safari",
         Accept: "image/avif,image/webp,image/apng,image/*,*/*;q=0.8",
         Referer: "https://www.thingiverse.com/",
       },
@@ -168,34 +162,6 @@ router.get("/api/thingiverse/img", async (req, res) => {
   } catch (err) {
     console.error("Image proxy error:", err?.response?.status || err.message);
     res.status(502).send("Image fetch failed");
-  }
-});
-
-// (Optional) Debug helpers you used during setup:
-router.get("/thingiverse/debug-token", (_req, res) => {
-  res.json({ hasToken: !!process.env.THINGIVERSE_TOKEN });
-});
-
-router.get("/thingiverse/debug-curl", async (_req, res) => {
-  try {
-    const accessToken = process.env.THINGIVERSE_TOKEN;
-    if (!accessToken)
-      return res.status(500).json({ message: "Missing THINGIVERSE_TOKEN" });
-    const r = await axios.get("https://api.thingiverse.com/search/car/", {
-      params: { type: "things", page: 1, access_token: accessToken },
-      timeout: 10000,
-    });
-    res.json({
-      ok: true,
-      status: r.status,
-      hits: Array.isArray(r.data?.hits) ? r.data.hits.length : null,
-    });
-  } catch (e) {
-    res.status(e.response?.status || 500).json({
-      ok: false,
-      status: e.response?.status || 500,
-      data: e.response?.data || e.message,
-    });
   }
 });
 
